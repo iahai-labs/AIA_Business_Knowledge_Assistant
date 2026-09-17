@@ -1,0 +1,33 @@
+services:
+  app:
+    build: .
+    container_name: aia-knowledge-app
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: aia-knowledge-db
+    environment:
+      POSTGRES_USER: aia
+      POSTGRES_PASSWORD: aia
+      POSTGRES_DB: aia_knowledge
+    ports:
+      - "5432:5432"
+    volumes:
+      - aia_knowledge_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aia -d aia_knowledge"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  aia_knowledge_postgres:
