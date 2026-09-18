@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "AIA Business Knowledge Assistant"
-    app_version: str = "0.9.0"
+    app_version: str = "1.0.0"
     environment: str = "development"
     debug: bool = True
 
@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     rate_limit_requests: int = 60
     rate_limit_window_seconds: int = 60
     max_request_body_mb: int = 12
-    trusted_hosts: str = "localhost,127.0.0.1"
+    trusted_hosts: str = "localhost,127.0.0.1,testserver"
     enable_hsts: bool = False
 
     model_config = SettingsConfigDict(

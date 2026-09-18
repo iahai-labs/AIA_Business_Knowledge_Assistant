@@ -1,6 +1,6 @@
 [project]
 name = "aia-business-knowledge-assistant"
-version = "0.9.0"
+version = "1.0.0"
 description = "A production-minded AI knowledge assistant for small and medium businesses."
 requires-python = ">=3.12"
 

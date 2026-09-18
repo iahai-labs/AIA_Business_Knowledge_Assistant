@@ -12,7 +12,7 @@ def release_info() -> ReleaseInfoResponse:
         name=settings.app_name,
         version=settings.app_version,
         environment=settings.environment,
-        status="release-candidate",
+        status="stable",
         features=[
             "authentication",
             "user-ownership",

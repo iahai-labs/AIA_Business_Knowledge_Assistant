@@ -2,95 +2,119 @@
 
 A production-minded, multi-user Retrieval-Augmented Generation system for small and medium businesses.
 
-## Release Candidate
+## Stable Release
 
-**v0.9.0**
+**v1.0.0**
 
-The project is now feature-complete for the portfolio release and is in release-candidate validation.
+AIA Business Knowledge Assistant turns business documents into a secure, searchable knowledge system with grounded AI answers and source metadata.
 
-## What It Does
+## Architecture
 
-Business users upload internal documents and ask natural-language questions. The system retrieves relevant document chunks and produces grounded answers with source metadata.
+```mermaid
+flowchart TD
+    U[Authenticated User] --> API[FastAPI]
+    API --> SEC[Security + Observability Middleware]
+    SEC --> AUTH[JWT Authentication]
+    AUTH --> OWN[User Ownership Boundary]
 
-```text
-Business Documents
-        |
-        v
-Text Extraction + Chunking
-        |
-        v
-Jina Embeddings
-        |
-        v
-PostgreSQL + pgvector
-        |
-        v
-Semantic Retrieval
-        |
-        v
-Similarity Filter
-        |
-        v
-Groq LLM
-        |
-        v
-Grounded Answer + Sources
+    OWN --> DOC[Document Ingestion]
+    DOC --> CHUNK[Chunking]
+    CHUNK --> JINA[Jina Embeddings]
+    JINA --> PG[(PostgreSQL + pgvector)]
+
+    OWN --> Q[Question]
+    Q --> JQ[Jina Query Embedding]
+    JQ --> PG
+    PG --> RET[Semantic Retrieval]
+    RET --> FILTER[Similarity Filter]
+    FILTER --> CTX[Context Builder]
+    CTX --> GROQ[Groq LLM]
+    GROQ --> ANS[Grounded Answer + Sources]
+
+    API --> ADMIN[Admin Read-only APIs]
+    API --> OBS[Logs + Metrics + Request IDs]
 ```
 
-## Engineering Features
+## Highlights
 
-- FastAPI
-- PostgreSQL
-- pgvector
+- FastAPI backend
+- PostgreSQL + pgvector
 - Jina embeddings
-- Groq LLM integration
+- Groq grounded generation
 - PDF/TXT/Markdown ingestion
-- semantic retrieval
-- grounded RAG answers
+- semantic search
+- similarity thresholding
+- safe no-context fallback
 - source metadata
 - conversation persistence
-- email/password authentication
 - Argon2 password hashing
-- JWT bearer authentication
-- user-owned documents
-- user-owned conversations
-- admin read-only operations
-- structured JSON logging
-- request IDs
-- request latency tracking
+- JWT authentication
+- per-user resource isolation
+- administrator visibility
+- structured JSON logs
+- request tracing
 - provider retries and timeouts
+- readiness checks
 - runtime metrics
-- CORS policy
-- trusted-host validation
-- request-size limits
 - rate limiting
+- request-size limits
 - MIME validation
-- security headers
+- browser security headers
+- CORS and trusted-host controls
 - non-root Docker execution
 - Alembic migration management
 
-## Demo Data
+## Quick Start
 
-Sample business documents are included in:
+Create `.env` from `.env.example` and configure:
+
+```text
+JINA_API_KEY
+GROQ_API_KEY
+JWT_SECRET_KEY
+```
+
+Then:
+
+```powershell
+docker compose up --build -d
+docker compose exec app alembic stamp 0001
+docker compose exec app pytest
+```
+
+Development Swagger:
+
+```text
+http://localhost:8000/docs
+```
+
+## Demo
+
+Demo documents:
 
 ```text
 demo_data/
 ```
 
-Recommended demo flow:
+Recommended file:
 
-1. register a user
-2. log in
-3. authorize in Swagger
-4. upload `demo_data/automation_services.txt`
-5. index the document
-6. ask:
+```text
+demo_data/automation_services.txt
+```
+
+Ask:
 
 ```text
 Can the company automate repetitive business tasks?
 ```
 
-7. ask an unrelated question to demonstrate safe fallback
+Then ask:
+
+```text
+What is the weather in Berlin today?
+```
+
+The second question should return a safe no-context response rather than inventing an answer.
 
 ## Operational Endpoints
 
@@ -112,30 +136,12 @@ GET /api/admin/conversations
 GET /api/admin/metrics
 ```
 
-## Development
+## Validation
 
 ```powershell
-docker compose up --build -d
 docker compose exec app pytest
-```
-
-Swagger:
-
-```text
-http://localhost:8000/docs
-```
-
-## Database Migrations
-
-```powershell
-docker compose exec app alembic current
-docker compose exec app alembic upgrade head
-```
-
-## Smoke Test
-
-```powershell
 docker compose exec app python scripts/smoke_test.py
+docker compose exec app alembic current
 ```
 
 ## Documentation
@@ -143,15 +149,17 @@ docker compose exec app python scripts/smoke_test.py
 - `docs/architecture.md`
 - `docs/architecture-diagram.md`
 - `docs/api-examples.md`
+- `docs/demo-script.md`
 - `docs/deployment.md`
-- `docs/production-checklist.md`
-- `docs/security.md`
-- `docs/security-hardening.md`
+- `docs/github-publishing-checklist.md`
 - `docs/observability.md`
 - `docs/portfolio-story.md`
-- `docs/upgrade-v0.9.0.md`
+- `docs/production-checklist.md`
+- `docs/release-notes-v1.0.0.md`
+- `docs/security.md`
+- `docs/security-hardening.md`
 
-## Roadmap
+## Release History
 
 - `v0.1.0` Foundation
 - `v0.2.1` Document ingestion
@@ -162,7 +170,7 @@ docker compose exec app python scripts/smoke_test.py
 - `v0.7.0` Observability + reliability
 - `v0.8.0` Security + production hardening
 - `v0.9.0` Release candidate
-- `v1.0.0` Portfolio release
+- `v1.0.0` Stable portfolio release
 
 ## License
 

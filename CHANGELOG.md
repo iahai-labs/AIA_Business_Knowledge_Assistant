@@ -1,30 +1,28 @@
 # Changelog
 
+## [1.0.0] - 2026-09-18
+
+### Stable Portfolio Release
+
+- finalized README and public documentation
+- finalized portfolio demo script
+- added GitHub publishing checklist
+- added v1.0.0 release notes
+- marked `/release` status as stable
+- preserved security, reliability, authentication, ownership, RAG, and admin capabilities
+- included Swagger CSP compatibility for development
+- included `testserver` in the default development trusted-host list
+- configured pytest cache for non-root containers
+
 ## [0.9.0] - 2026-09-18
 
 ### Added
 
-- release metadata endpoint
-- demo business dataset
-- API examples
-- deployment guide
+- release candidate metadata
+- demo dataset
+- deployment documentation
 - production checklist
-- architecture diagram
-- portfolio story
-- smoke-test script
-- release candidate tests
-- authentication-required tests
-- security-header tests
-
-### Changed
-
-- documentation reorganized for portfolio presentation
-- release version advanced to 0.9.0
-- pytest cache moved to a writable temporary location for non-root Docker execution
-
-### Release Candidate
-
-No new product features should be added after this milestone unless required to fix a release-blocking defect.
+- smoke tests
 
 ## [0.8.0] - 2026-09-18
 
@@ -42,8 +40,7 @@ No new product features should be added after this milestone unless required to 
 
 - observability
 - reliability
-- request tracing
-- provider retries
+- provider retry handling
 
 ## [0.6.0] - 2026-09-18
 
@@ -71,7 +68,7 @@ No new product features should be added after this milestone unless required to 
 ### Added
 
 - Jina embeddings
-- semantic retrieval
+- pgvector semantic retrieval
 
 ## [0.2.1] - 2026-09-18
 

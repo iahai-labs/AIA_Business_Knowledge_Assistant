@@ -3,7 +3,7 @@ from threading import Lock
 from time import monotonic
 
 from fastapi import Request
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.core.config import settings
@@ -33,7 +33,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
                 "default-src 'self'; "
                 "img-src 'self' data: https:; "
                 "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
-                "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.redoc.ly; "
+                "script-src 'self' 'unsafe-inline' "
+                "https://cdn.jsdelivr.net https://cdn.redoc.ly; "
                 "connect-src 'self'; "
                 "font-src 'self' data: https://cdn.jsdelivr.net; "
                 "frame-ancestors 'none'"
@@ -87,7 +88,10 @@ class InMemoryRateLimitMiddleware(BaseHTTPMiddleware):
         self._lock = Lock()
 
     async def dispatch(self, request: Request, call_next):
-        if request.url.path.startswith("/health") or request.url.path == "/ready":
+        if request.url.path.startswith("/health") or request.url.path in {
+            "/ready",
+            "/release",
+        }:
             return await call_next(request)
 
         client_host = request.client.host if request.client else "unknown"
