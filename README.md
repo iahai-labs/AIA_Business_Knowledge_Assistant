@@ -1,84 +1,104 @@
 # AIA Business Knowledge Assistant
 
-A production-minded AI knowledge system for small and medium businesses.
+A production-minded, multi-user RAG knowledge system for small and medium businesses.
 
 ## Current Release
 
-**v0.6.0 — Admin Workflows + Operational Visibility**
+**v0.7.0 — Observability + Reliability**
 
-The system now combines multi-user RAG with a minimal read-only administrator layer.
+This release adds request tracing, structured logging, provider retries, readiness checks, and lightweight runtime metrics.
 
 ## Architecture
 
 ```text
-Users
-  |
-  +--> JWT-authenticated user APIs
-  |       |
-  |       +--> owned documents
-  |       +--> Jina embeddings
-  |       +--> pgvector retrieval
-  |       +--> Groq grounded answers
-  |       +--> owned conversations
-  |
-  +--> Admin authorization
-          |
-          +--> system stats
-          +--> user overview
-          +--> document overview
-          +--> conversation overview
+Authenticated User
+      |
+      v
+FastAPI
+      |
+      +--> Request ID + Timing
+      |
+      +--> User-owned RAG
+      |       |
+      |       +--> Jina Embeddings
+      |       +--> pgvector
+      |       +--> Groq Grounded Answers
+      |
+      +--> Admin Workflows
+      |
+      v
+Structured Logs + Runtime Metrics
 ```
 
 ## Current Capabilities
 
-- email/password registration
+- email/password authentication
 - Argon2 password hashing
 - JWT bearer authentication
 - per-user document ownership
-- per-user vector retrieval
-- per-user conversation isolation
+- per-user retrieval isolation
 - Jina embeddings
 - PostgreSQL + pgvector
 - Groq grounded answers
 - source metadata
-- safe no-context responses
-- read-only admin authorization
-- system operational statistics
-- admin user overview
-- admin document overview
-- admin conversation overview
-- automated security and authorization tests
+- safe no-context behavior
+- conversation persistence
+- read-only admin workflows
+- request IDs
+- request latency headers
+- JSON structured logging
+- sensitive-key redaction
+- bounded provider retries
+- provider timeout handling
+- database health check
+- provider configuration health
+- readiness endpoint
+- admin runtime metrics
+- automated reliability tests
 
-## Admin API
-
-```text
-GET /api/admin/stats
-GET /api/admin/users
-GET /api/admin/documents
-GET /api/admin/conversations
-```
-
-Admin endpoints require a user whose database record has:
+## Health and Readiness
 
 ```text
-is_admin = TRUE
+GET /health
+GET /health/db
+GET /health/providers
+GET /ready
 ```
 
-Normal authenticated users receive HTTP 403.
+## Runtime Metrics
+
+Admin-only:
+
+```text
+GET /api/admin/metrics
+```
+
+## Request Diagnostics
+
+Responses include:
+
+```text
+X-Request-ID
+X-Process-Time-Ms
+```
+
+Use the request ID to correlate client failures with application logs.
+
+## Logs
+
+```powershell
+docker compose logs app -f
+```
 
 ## Upgrade
 
 Read:
 
 ```text
-docs/upgrade-v0.6.0.md
+docs/upgrade-v0.7.0.md
 ```
 
-## Swagger
-
-```text
-http://localhost:8000/docs
-```
+No database schema migration is required for this release.
 
 ## Tests
 
@@ -94,6 +114,8 @@ docker compose exec app pytest
 - `v0.4.0` Grounded answers + citations
 - `v0.5.0` Authentication + user ownership
 - `v0.6.0` Admin workflows + operational visibility
+- `v0.7.0` Observability + reliability
+- `v0.8.0` Security + production hardening
 - `v0.9.0` Release candidate
 - `v1.0.0` Portfolio release
 

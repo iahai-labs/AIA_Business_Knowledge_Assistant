@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "AIA Business Knowledge Assistant"
-    app_version: str = "0.6.0"
+    app_version: str = "0.7.0"
     environment: str = "development"
     debug: bool = True
 
@@ -37,6 +37,12 @@ class Settings(BaseSettings):
     jwt_secret_key: str = ""
     jwt_algorithm: str = "HS256"
     jwt_access_token_minutes: int = 60
+
+    log_level: str = "INFO"
+    log_json: bool = True
+    provider_retry_attempts: int = 3
+    provider_retry_backoff_seconds: float = 0.4
+    request_slow_threshold_ms: float = 1500.0
 
     model_config = SettingsConfigDict(
         env_file=".env",

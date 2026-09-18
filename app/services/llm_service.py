@@ -1,6 +1,11 @@
+import logging
+
 import httpx
 
 from app.core.config import settings
+from app.core.reliability import run_with_http_retry
+
+logger = logging.getLogger("aia.llm")
 
 
 class LLMProviderError(RuntimeError):
@@ -49,16 +54,43 @@ def generate_grounded_answer(
         "Content-Type": "application/json",
     }
 
-    try:
+    def request():
         with httpx.Client(timeout=settings.groq_timeout_seconds) as client:
             response = client.post(url, headers=headers, json=payload)
             response.raise_for_status()
+            return response
+
+    try:
+        response = run_with_http_retry(
+            provider="groq",
+            operation="chat_completion",
+            fn=request,
+        )
     except httpx.HTTPStatusError as exc:
+        logger.error(
+            "Groq API request failed",
+            extra={
+                "event": "provider_failed",
+                "provider": "groq",
+                "operation": "chat_completion",
+                "status_code": exc.response.status_code,
+                "error_type": type(exc).__name__,
+            },
+        )
         body = exc.response.text[:1000]
         raise LLMProviderError(
             f"Groq API returned HTTP {exc.response.status_code}: {body}"
         ) from exc
     except httpx.HTTPError as exc:
+        logger.error(
+            "Groq API connection failed",
+            extra={
+                "event": "provider_failed",
+                "provider": "groq",
+                "operation": "chat_completion",
+                "error_type": type(exc).__name__,
+            },
+        )
         raise LLMProviderError(
             f"Could not connect to Groq API: {exc}"
         ) from exc

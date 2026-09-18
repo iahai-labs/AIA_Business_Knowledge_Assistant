@@ -13,4 +13,6 @@ def test_health_check() -> None:
 
     assert payload["status"] == "ok"
     assert payload["service"] == "AIA Business Knowledge Assistant"
-    assert payload["version"] == "0.6.0"
+    assert payload["version"] == "0.7.0"
+    assert response.headers["X-Request-ID"]
+    assert response.headers["X-Process-Time-Ms"]

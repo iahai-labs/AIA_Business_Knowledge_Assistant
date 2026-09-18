@@ -1,7 +1,9 @@
+import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
 import app.models  # noqa: F401
@@ -14,6 +16,11 @@ from app.api.retrieval import router as retrieval_router
 from app.core.config import settings
 from app.db.base import Base
 from app.db.session import engine
+from app.middleware.observability import ObservabilityMiddleware
+from app.observability.logging import configure_logging
+
+configure_logging()
+logger = logging.getLogger("aia.app")
 
 
 @asynccontextmanager
@@ -24,7 +31,18 @@ async def lifespan(_: FastAPI):
         connection.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
 
     Base.metadata.create_all(bind=engine)
+
+    logger.info(
+        "Application startup complete",
+        extra={"event": "startup_complete"},
+    )
+
     yield
+
+    logger.info(
+        "Application shutdown complete",
+        extra={"event": "shutdown_complete"},
+    )
 
 
 def create_app() -> FastAPI:
@@ -35,6 +53,30 @@ def create_app() -> FastAPI:
         redoc_url="/redoc" if settings.debug else None,
         lifespan=lifespan,
     )
+
+    app.add_middleware(ObservabilityMiddleware)
+
+    @app.exception_handler(Exception)
+    async def unhandled_exception_handler(
+        request: Request,
+        exc: Exception,
+    ) -> JSONResponse:
+        logger.exception(
+            "Unhandled application exception",
+            extra={
+                "event": "unhandled_exception",
+                "method": request.method,
+                "path": request.url.path,
+                "error_type": type(exc).__name__,
+            },
+        )
+
+        return JSONResponse(
+            status_code=500,
+            content={
+                "detail": "Internal server error.",
+            },
+        )
 
     app.include_router(health_router)
     app.include_router(auth_router, prefix="/api")

@@ -92,3 +92,31 @@ Authenticated Admin
 ```
 
 Admin authorization is checked against the current user record in PostgreSQL.
+
+
+## v0.7.0 Reliability Layer
+
+```text
+HTTP Request
+   |
+   v
+Request ID + Timing Middleware
+   |
+   v
+Application
+   |
+   +--> Database
+   |
+   +--> Jina
+   |      |
+   |      +--> bounded retry + timeout
+   |
+   +--> Groq
+          |
+          +--> bounded retry + timeout
+   |
+   v
+Structured Log + Runtime Metrics
+```
+
+The reliability layer is intentionally simple and dependency-light so it remains easy to understand in a portfolio review.

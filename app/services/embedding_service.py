@@ -1,10 +1,14 @@
+import logging
 from typing import Literal
 
 import httpx
 
 from app.core.config import settings
+from app.core.reliability import run_with_http_retry
 
 EmbeddingTask = Literal["retrieval.passage", "retrieval.query"]
+
+logger = logging.getLogger("aia.embedding")
 
 
 class EmbeddingProviderError(RuntimeError):
@@ -46,16 +50,43 @@ def _request_embeddings(
         "Content-Type": "application/json",
     }
 
-    try:
+    def request():
         with httpx.Client(timeout=settings.embedding_timeout_seconds) as client:
             response = client.post(url, headers=headers, json=payload)
             response.raise_for_status()
+            return response
+
+    try:
+        response = run_with_http_retry(
+            provider="jina",
+            operation=task,
+            fn=request,
+        )
     except httpx.HTTPStatusError as exc:
+        logger.error(
+            "Jina API request failed",
+            extra={
+                "event": "provider_failed",
+                "provider": "jina",
+                "operation": task,
+                "status_code": exc.response.status_code,
+                "error_type": type(exc).__name__,
+            },
+        )
         body = exc.response.text[:1000]
         raise EmbeddingProviderError(
             f"Jina API returned HTTP {exc.response.status_code}: {body}"
         ) from exc
     except httpx.HTTPError as exc:
+        logger.error(
+            "Jina API connection failed",
+            extra={
+                "event": "provider_failed",
+                "provider": "jina",
+                "operation": task,
+                "error_type": type(exc).__name__,
+            },
+        )
         raise EmbeddingProviderError(
             f"Could not connect to Jina Embeddings API: {exc}"
         ) from exc

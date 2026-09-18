@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_admin, get_db
 from app.models.user import User
+from app.observability.metrics import get_metrics_snapshot
+from app.schemas.metrics import RuntimeMetricsResponse
 from app.schemas.admin import (
     AdminConversationResponse,
     AdminDocumentResponse,
@@ -49,3 +51,17 @@ def conversations(
     _: User = Depends(get_current_admin),
 ) -> list[AdminConversationResponse]:
     return admin_conversations(db)
+
+
+@router.get("/metrics", response_model=RuntimeMetricsResponse)
+def runtime_metrics(
+    _: User = Depends(get_current_admin),
+) -> RuntimeMetricsResponse:
+    snapshot = get_metrics_snapshot()
+
+    return RuntimeMetricsResponse(
+        requests_total=snapshot.requests_total,
+        errors_total=snapshot.errors_total,
+        slow_requests_total=snapshot.slow_requests_total,
+        average_duration_ms=round(snapshot.average_duration_ms, 2),
+    )

@@ -51,3 +51,10 @@ Administrator privileges are stored as a server-side boolean on the user record.
 The API does not trust a client-supplied role or JWT claim for administrator status. It loads the current user from the database and checks `is_admin` on each protected admin request.
 
 Admin endpoints are read-only in v0.6.0 and do not expose password hashes or application secrets.
+
+
+## Privacy-Conscious Logging
+
+Observability logs must not intentionally include passwords, access tokens, API keys, JWT secrets, or password hashes.
+
+Known sensitive dictionary keys are redacted by the logging helper. Application code should still avoid logging raw request bodies and credentials.
