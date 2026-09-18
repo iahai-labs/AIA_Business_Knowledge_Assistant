@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "AIA Business Knowledge Assistant"
-    app_version: str = "0.2.1"
+    app_version: str = "0.3.1"
     environment: str = "development"
     debug: bool = True
 
@@ -14,6 +14,17 @@ class Settings(BaseSettings):
     upload_dir: str = "uploads"
     max_upload_mb: int = 10
     allowed_extensions: str = ".pdf,.txt,.md"
+
+    embedding_provider: str = "jina"
+    jina_api_key: str = ""
+    jina_base_url: str = "https://api.jina.ai/v1"
+    embedding_model: str = "jina-embeddings-v5-text-small"
+    embedding_dimensions: int = 1024
+    embedding_timeout_seconds: float = 30.0
+
+    chunk_size: int = 1200
+    chunk_overlap: int = 200
+    retrieval_top_k: int = 5
 
     model_config = SettingsConfigDict(
         env_file=".env",

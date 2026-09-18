@@ -1,29 +1,18 @@
-# Python
 __pycache__/
 *.py[cod]
 *.egg-info/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
-
-# Environments
 .venv/
 venv/
 .env
-
-# IDE
 .vscode/
 .idea/
-
-# OS
 .DS_Store
 Thumbs.db
-
-# Logs and coverage
 *.log
 .coverage
 htmlcov/
-
-# Runtime data
 data/
 uploads/

@@ -1,23 +1,23 @@
 # Architecture Decisions
 
-## ADR-001 — FastAPI
+## ADR-001 — Separate Embedding and Chat Providers
 
-FastAPI remains the backend framework.
+The system intentionally does not require a single vendor for all AI capabilities.
 
-## ADR-002 — PostgreSQL + pgvector
+Jina handles vector embeddings and semantic retrieval. A separate LLM provider can handle grounded answer generation in later releases.
 
-PostgreSQL remains the primary data store. Vector support will be activated in the RAG milestone.
+## ADR-002 — Jina v5 Text Small
 
-## ADR-003 — Local Storage for Portfolio Demo
+`jina-embeddings-v5-text-small` is used for text retrieval. The project uses separate retrieval tasks for indexed passages and user queries.
 
-Uploaded files are stored on local disk for the portfolio demo. This keeps the deployment simple while preserving a clear abstraction boundary for future object storage.
+## ADR-003 — 1024 Vector Dimensions
 
-For a larger production deployment, this can be replaced with S3-compatible object storage.
+The release uses the model's 1024-dimensional output to preserve retrieval quality while keeping configuration straightforward.
 
-## ADR-004 — SHA-256 Duplicate Detection
+## ADR-004 — Direct HTTP Client
 
-The ingestion pipeline hashes file contents and rejects duplicate documents.
+The Jina API is called directly using HTTPX. This keeps provider behavior explicit and avoids pretending that all embedding providers are fully OpenAI-compatible.
 
-## ADR-005 — Allowlist File Validation
+## ADR-005 — No Alembic Yet
 
-Version 0.2.0 accepts PDF, TXT, and Markdown files only. Additional formats must be explicitly introduced with their own text extractors and validation rules.
+This portfolio milestone uses a controlled development migration for the empty chunk table. Formal schema migrations will be added before the production release.

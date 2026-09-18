@@ -21,3 +21,12 @@ class DocumentResponse(BaseModel):
 class DocumentListResponse(BaseModel):
     items: list[DocumentResponse]
     total: int
+
+
+class DocumentIndexResponse(BaseModel):
+    document_id: int
+    chunks_created: int
+    embedding_provider: str
+    embedding_model: str
+    embedding_dimensions: int
+    status: str

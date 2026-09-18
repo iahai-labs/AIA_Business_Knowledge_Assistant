@@ -2,132 +2,114 @@
 
 A production-minded AI knowledge system for small and medium businesses.
 
-## Business Problem
-
-Business information is often scattered across PDFs, internal guides, policies, product documents, and support material. Employees and customers waste time searching for reliable answers, while generic AI assistants may respond without grounding in the company's actual knowledge.
-
-## Solution
-
-AIA Business Knowledge Assistant turns business documents into a searchable knowledge system. The final portfolio release will answer questions using retrieved company knowledge and provide source references.
-
 ## Current Release
 
-**v0.2.0 — Document Ingestion**
+**v0.3.1 — Jina Embeddings + pgvector**
 
-This release adds:
+This release uses a dedicated retrieval provider rather than coupling embeddings to the future chat model.
 
-- document upload API
-- PDF, TXT, and Markdown support
-- file extension allowlist
-- upload size validation
-- SHA-256 duplicate detection
-- server-generated storage filenames
-- PDF text extraction
-- document metadata persistence
-- extracted text persistence
-- list, detail, and delete document endpoints
-- document validation tests
-
-## API Endpoints
+## AI Architecture
 
 ```text
-GET     /health
-GET     /health/db
+Documents
+   |
+   v
+Jina Embeddings
+   |
+   v
+PostgreSQL + pgvector
+   |
+   v
+Semantic Retrieval
 
+Future v0.4:
+Retrieved Context
+   |
+   v
+Groq LLM
+   |
+   v
+Grounded Answer + Sources
+```
+
+## Current Capabilities
+
+- PDF, TXT, and Markdown ingestion
+- text extraction
+- configurable chunking
+- Jina text embeddings
+- separate `retrieval.passage` and `retrieval.query` tasks
+- 1024-dimensional pgvector storage
+- semantic similarity search
+- top-k retrieval
+- source document metadata
+- duplicate-file detection
+- Docker development environment
+- automated tests
+
+## Jina Configuration
+
+Create a free Jina API key and configure:
+
+```env
+EMBEDDING_PROVIDER=jina
+JINA_API_KEY=your-key
+JINA_BASE_URL=https://api.jina.ai/v1
+EMBEDDING_MODEL=jina-embeddings-v5-text-small
+EMBEDDING_DIMENSIONS=1024
+```
+
+Do not commit `.env`.
+
+## Upgrade from v0.3.0
+
+Read:
+
+```text
+docs/upgrade-v0.3.1.md
+```
+
+The vector dimension changed from 1536 to 1024, so an existing empty `document_chunks` table from v0.3.0 must be recreated.
+
+## Main API
+
+```text
 POST    /api/documents
 GET     /api/documents
 GET     /api/documents/{document_id}
+POST    /api/documents/{document_id}/index
 DELETE  /api/documents/{document_id}
+
+POST    /api/retrieval/search
 ```
 
-Interactive API documentation is available at:
+Swagger:
 
 ```text
 http://localhost:8000/docs
 ```
 
-## Tech Stack
+## Example Retrieval Request
 
-- Python 3.12
-- FastAPI
-- SQLAlchemy 2
-- PostgreSQL
-- pgvector-ready PostgreSQL image
-- PyPDF
-- Docker
-- Docker Compose
-- pytest
+```json
+{
+  "query": "What services does the company provide?",
+  "top_k": 5
+}
+```
 
-## Quick Start
-
-### 1. Create environment file
-
-Windows PowerShell:
+## Tests
 
 ```powershell
-Copy-Item .env.example .env
-```
-
-Linux/macOS:
-
-```bash
-cp .env.example .env
-```
-
-### 2. Start the project
-
-```bash
-docker compose up --build
-```
-
-### 3. Run tests
-
-```bash
 docker compose exec app pytest
-```
-
-### 4. Upload a document
-
-Use Swagger UI:
-
-```text
-http://localhost:8000/docs
-```
-
-Open `POST /api/documents`, choose a PDF, TXT, or Markdown file, and execute the request.
-
-## Security Baseline
-
-- `.env` and runtime uploads are excluded from Git
-- upload extensions use an explicit allowlist
-- file size is limited
-- storage filenames are generated on the server
-- raw user filenames are not used as paths
-- duplicate content is detected using SHA-256
-- API credentials should never be committed
-
-## Repository Structure
-
-```text
-app/
-  api/
-  core/
-  db/
-  models/
-  repositories/
-  schemas/
-  services/
-docs/
-tests/
-uploads/          # runtime only, not committed
 ```
 
 ## Roadmap
 
 - `v0.1.0` Foundation
-- `v0.2.0` Document ingestion
-- `v0.3.0` RAG retrieval
-- `v0.4.0` Chat and citations
+- `v0.2.1` Document ingestion
+- `v0.3.1` Jina embeddings + pgvector
+- `v0.4.0` Groq grounded answers + citations
 - `v0.5.0` Authentication
 - `v0.6.0` Admin workflows
 - `v0.9.0` Release candidate

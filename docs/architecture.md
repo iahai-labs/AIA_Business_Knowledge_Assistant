@@ -1,80 +1,53 @@
 # Architecture
 
-## Version 0.2.0 Scope
+## Version 0.3.1 Scope
 
-Version 0.2.0 adds document ingestion to the project foundation.
+Version 0.3.1 replaces OpenAI embeddings with a dedicated Jina embedding provider while preserving PostgreSQL + pgvector retrieval.
 
-## High-Level Architecture
-
-```text
-Client
-  |
-  v
-FastAPI
-  |
-  +--> Health API
-  |
-  +--> Documents API
-          |
-          v
-     Document Service
-          |
-          +--> Validation
-          +--> Local File Storage
-          +--> Text Extraction
-          |
-          v
-     Repository Layer
-          |
-          v
-      PostgreSQL
-```
-
-## Document Ingestion Flow
+## Retrieval Architecture
 
 ```text
-Upload
-  |
-  v
-Validate extension
-  |
-  v
-Validate file size
-  |
-  v
-SHA-256 duplicate check
-  |
-  v
-Store file
-  |
-  v
-Extract text
-  |
-  v
-Store document metadata + extracted text
+Business Documents
+        |
+        v
+Text Extraction
+        |
+        v
+Chunking
+        |
+        v
+Jina Embeddings API
+  retrieval.passage
+        |
+        v
+PostgreSQL + pgvector
+        |
+        v
+User Query
+        |
+        v
+Jina Embeddings API
+  retrieval.query
+        |
+        v
+Cosine Similarity Search
+        |
+        v
+Top-K Relevant Chunks
 ```
 
-## Supported Formats
+## Provider Separation
 
-- PDF
-- TXT
-- Markdown
+Embedding generation is isolated behind the embedding service. The future answer-generation layer can therefore use a different LLM provider such as Groq without changing vector retrieval.
 
-## Security Notes
+## Vector Dimension
 
-- executable files are rejected by extension allowlist
-- upload size is limited
-- stored filenames are generated server-side
-- original user filenames are never used as storage paths
-- uploaded files are excluded from Git
-- SHA-256 is used for duplicate detection
+`jina-embeddings-v5-text-small` produces 1024-dimensional embeddings by default and supports Matryoshka dimensions. This release uses 1024 dimensions.
 
-## Next Architecture Step
+## Upgrade Note
 
-Version 0.3.0 will introduce:
+Version 0.3.0 used a 1536-dimensional vector column. PostgreSQL does not automatically change an existing vector column when SQLAlchemy metadata changes.
 
-- document chunking
-- embeddings
-- pgvector columns
-- vector similarity retrieval
-- retrieval tests
+Because v0.3.0 never produced successful embeddings in this development environment, drop and recreate only the `document_chunks` table before starting v0.3.1.
+
+The original `documents` table and uploaded-document metadata remain intact.

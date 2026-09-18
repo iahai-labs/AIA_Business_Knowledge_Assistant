@@ -1,42 +1,44 @@
 # Changelog
 
-All notable changes to this project are documented here.
-
-## [0.2.0] - 2026-09-17
-
-### Added
-
-- document upload endpoint
-- PDF, TXT, and Markdown ingestion
-- extension allowlist validation
-- maximum upload size validation
-- SHA-256 duplicate detection
-- generated storage filenames
-- PDF text extraction
-- document database model
-- repository layer
-- document service layer
-- document list and detail endpoints
-- document delete endpoint
-- validation tests
-- persistent Docker upload volume
+## [0.3.1] - 2026-09-18
 
 ### Changed
 
-- application version updated to 0.2.0
-- architecture documentation updated for ingestion workflow
+- replaced OpenAI embedding calls with direct Jina Embeddings API integration
+- changed vector dimensions from 1536 to 1024
+- separated passage and query embedding tasks
+- removed the OpenAI package dependency from the retrieval milestone
+- improved embedding-provider error reporting
+
+### Added
+
+- embedding-provider configuration
+- Jina embedding service tests
+- v0.3.1 vector-table upgrade guide
+- provider and model metadata in indexing and retrieval responses
+
+## [0.3.0] - 2026-09-18
+
+### Added
+
+- pgvector-backed chunk model
+- text chunking
+- embedding pipeline
+- semantic retrieval
+
+## [0.2.1] - 2026-09-18
+
+### Fixed
+
+- SQLAlchemy circular import
+- model registration
+- release version mismatch
 
 ## [0.1.0] - 2026-09-17
 
 ### Added
 
-- initial FastAPI application
-- health endpoint
-- database health endpoint
-- centralized settings
-- PostgreSQL configuration
-- pgvector-ready Docker database
-- Docker Compose environment
-- health endpoint test
-- architecture documentation
-- repository documentation
+- FastAPI foundation
+- PostgreSQL
+- Docker
+- health checks
