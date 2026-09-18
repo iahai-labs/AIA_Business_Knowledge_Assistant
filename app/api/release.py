@@ -21,5 +21,6 @@ def release_info() -> ReleaseInfoResponse:
             "admin-workflows",
             "observability",
             "security-hardening",
+            "web-ui",
         ],
     )

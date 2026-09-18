@@ -4,9 +4,22 @@ A production-minded, multi-user Retrieval-Augmented Generation system for small 
 
 ## Stable Release
 
-**v1.0.0**
+**v1.1.0**
 
-AIA Business Knowledge Assistant turns business documents into a secure, searchable knowledge system with grounded AI answers and source metadata.
+AIA Business Knowledge Assistant turns business documents into a secure, searchable knowledge system with grounded AI answers and source metadata. v1.1.0 also includes a minimal browser UI for the live portfolio demo.
+
+
+## Web UI
+
+The application root provides a minimal browser interface for:
+
+- account registration and login
+- document upload and automatic indexing
+- document listing
+- grounded question answering
+- source citations
+
+The public demo UI is intentionally lightweight and uses the existing FastAPI API.
 
 ## Architecture
 
@@ -171,6 +184,7 @@ docker compose exec app alembic current
 - `v0.8.0` Security + production hardening
 - `v0.9.0` Release candidate
 - `v1.0.0` Stable portfolio release
+- `v1.1.0` Minimal live-demo web UI
 
 ## License
 

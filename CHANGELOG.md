@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.1.0] - 2026-09-18
+
+### Added
+
+- minimal browser UI at `/`
+- account registration and login
+- document upload and automatic indexing flow
+- document listing
+- grounded question-answering interface
+- source citation display
+- public-demo privacy warning
+- UI availability test
+
+### Changed
+
+- release metadata now includes `web-ui`
+
+
 ## [1.0.0] - 2026-09-18
 
 ### Stable Portfolio Release

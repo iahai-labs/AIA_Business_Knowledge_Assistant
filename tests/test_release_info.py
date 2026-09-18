@@ -12,7 +12,8 @@ def test_release_info() -> None:
 
     payload = response.json()
 
-    assert payload["version"] == "1.0.0"
+    assert payload["version"] == "1.1.0"
     assert payload["status"] == "stable"
     assert "rag-retrieval" in payload["features"]
     assert "security-hardening" in payload["features"]
+    assert "web-ui" in payload["features"]

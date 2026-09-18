@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AIA Business Knowledge Assistant live demo">
+  <title>AIA Business Knowledge Assistant</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b0f14;
+      --panel: #111822;
+      --panel-2: #151f2b;
+      --line: #263445;
+      --text: #ecf2f8;
+      --muted: #96a4b5;
+      --accent: #8fb8ff;
+      --good: #8ee3b5;
+      --warn: #ffd38a;
+      --bad: #ff9e9e;
+      --shadow: 0 18px 60px rgba(0, 0, 0, .28);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(81, 125, 190, .15), transparent 34rem),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    a { color: var(--accent); }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 56px;
+    }
+
+    header {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 46px);
+      line-height: 1.05;
+      letter-spacing: -.035em;
+    }
+
+    .subtitle {
+      margin: 12px 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 720px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      background: rgba(17, 24, 34, .75);
+      border-radius: 999px;
+      padding: 9px 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--good);
+      box-shadow: 0 0 0 4px rgba(142, 227, 181, .1);
+    }
+
+    .notice {
+      margin-bottom: 20px;
+      border: 1px solid #55452f;
+      background: rgba(255, 211, 138, .06);
+      color: #e8cfaa;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .stack {
+      display: grid;
+      gap: 20px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(21, 31, 43, .95), rgba(17, 24, 34, .95));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .card h2 {
+      margin: 0 0 6px;
+      font-size: 17px;
+      letter-spacing: -.01em;
+    }
+
+    .card p.help {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: rgba(5, 9, 13, .45);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 7px;
+      padding: 9px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .tab.active {
+      background: var(--panel-2);
+      color: var(--text);
+    }
+
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      color: #c4cfdb;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    input, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(6, 10, 15, .72);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 11px 12px;
+      font: inherit;
+      outline: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #567cad;
+      box-shadow: 0 0 0 3px rgba(143, 184, 255, .08);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+      line-height: 1.5;
+    }
+
+    button.primary, button.secondary, button.danger {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 13px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: #dceaff;
+      color: #07111f;
+    }
+
+    button.secondary {
+      background: #1c2b3b;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    button.danger {
+      background: rgba(255, 158, 158, .09);
+      color: var(--bad);
+      border: 1px solid rgba(255, 158, 158, .24);
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .full { width: 100%; }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .between { justify-content: space-between; }
+
+    .hidden { display: none !important; }
+
+    .message {
+      margin-top: 12px;
+      min-height: 20px;
+      font-size: 13px;
+      color: var(--muted);
+      white-space: pre-wrap;
+    }
+
+    .message.good { color: var(--good); }
+    .message.bad { color: var(--bad); }
+
+    .userbox {
+      margin-top: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .useremail {
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .documents {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .doc {
+      border: 1px solid var(--line);
+      background: rgba(6, 10, 15, .38);
+      border-radius: 11px;
+      padding: 12px;
+    }
+
+    .doc-name {
+      font-size: 13px;
+      font-weight: 750;
+      overflow-wrap: anywhere;
+    }
+
+    .doc-meta {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .badge {
+      display: inline-flex;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      padding: 3px 7px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .chat-card { min-height: 620px; }
+
+    .answer {
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      background: rgba(7, 12, 18, .54);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .answer-header {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .answer-body {
+      white-space: pre-wrap;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .sources {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .source {
+      border-left: 2px solid #567cad;
+      background: rgba(86, 124, 173, .07);
+      padding: 9px 11px;
+      color: #c4cfdb;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .empty {
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+      header { flex-direction: column; }
+      .status { align-self: flex-start; }
+      .chat-card { min-height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <div class="eyebrow">AIA Studio · Live Project</div>
+        <h1>Business Knowledge Assistant</h1>
+        <p class="subtitle">
+          Turn business documents into a searchable AI knowledge base. Upload a document,
+          index it, and ask questions that are answered from the indexed content with sources.
+        </p>
+      </div>
+      <div class="status"><span class="dot"></span> v1.1.0 · Live</div>
+    </header>
+
+    <div class="notice">
+      Public demo environment. Do not upload confidential, personal, or sensitive business information.
+    </div>
+
+    <section class="layout">
+      <div class="stack">
+        <section class="card" id="authCard">
+          <h2>Access</h2>
+          <p class="help">Create a demo account or sign in to your existing one.</p>
+
+          <div class="tabs">
+            <button class="tab active" id="loginTab" type="button">Sign in</button>
+            <button class="tab" id="registerTab" type="button">Create account</button>
+          </div>
+
+          <form id="authForm">
+            <label for="email">Email</label>
+            <input id="email" type="email" autocomplete="email" required>
+
+            <label for="password">Password</label>
+            <input id="password" type="password" autocomplete="current-password" required>
+
+            <button class="primary full" id="authSubmit" type="submit" style="margin-top:14px">
+              Sign in
+            </button>
+          </form>
+
+          <div class="message" id="authMessage"></div>
+
+          <div class="userbox hidden" id="userBox">
+            <div>
+              <div class="muted">Signed in as</div>
+              <div class="useremail" id="userEmail"></div>
+            </div>
+            <button class="secondary" id="logoutButton" type="button">Sign out</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Knowledge Base</h2>
+          <p class="help">Upload PDF, TXT, or Markdown documents, then index them for semantic search.</p>
+
+          <form id="uploadForm">
+            <input id="fileInput" type="file" accept=".pdf,.txt,.md" required>
+            <button class="primary full" id="uploadButton" type="submit" style="margin-top:12px">
+              Upload & index
+            </button>
+          </form>
+
+          <div class="message" id="uploadMessage"></div>
+
+          <div class="row between" style="margin-top:18px">
+            <strong style="font-size:13px">Your documents</strong>
+            <button class="secondary" id="refreshDocs" type="button">Refresh</button>
+          </div>
+
+          <div class="documents" id="documents">
+            <div class="empty">Sign in to view documents.</div>
+          </div>
+        </section>
+      </div>
+
+      <section class="card chat-card">
+        <h2>Ask your business knowledge</h2>
+        <p class="help">
+          Answers are generated from relevant indexed document chunks. If the context is insufficient,
+          the assistant should say so instead of inventing an answer.
+        </p>
+
+        <form id="askForm">
+          <label for="question">Question</label>
+          <textarea id="question" placeholder="Example: Can the company automate repetitive business tasks?" required></textarea>
+          <div class="row between" style="margin-top:12px">
+            <span class="muted" id="conversationLabel">New conversation</span>
+            <button class="primary" id="askButton" type="submit">Ask assistant</button>
+          </div>
+        </form>
+
+        <div class="message" id="chatMessage"></div>
+
+        <div class="answer hidden" id="answerBox">
+          <div class="answer-header">
+            <strong>Answer</strong>
+            <span class="badge" id="groundedBadge">grounded</span>
+          </div>
+          <div class="answer-body" id="answerText"></div>
+          <div class="sources" id="sources"></div>
+        </div>
+      </section>
+    </section>
+
+    <footer>
+      AIA Business Knowledge Assistant · Portfolio demo · FastAPI + PostgreSQL + pgvector + Jina + Groq
+    </footer>
+  </main>
+
+  <script>
+    const state = {
+      token: localStorage.getItem("aia_bka_token") || "",
+      user: null,
+      authMode: "login",
+      conversationId: null,
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function apiUrl(path) {
+      return path.replace(/^\/+/, "");
+    }
+
+    async function api(path, options = {}) {
+      const headers = new Headers(options.headers || {});
+
+      if (state.token) {
+        headers.set("Authorization", `Bearer ${state.token}`);
+      }
+
+      const response = await fetch(apiUrl(path), { ...options, headers });
+
+      if (response.status === 204) {
+        return null;
+      }
+
+      const contentType = response.headers.get("content-type") || "";
+      const payload = contentType.includes("application/json")
+        ? await response.json()
+        : await response.text();
+
+      if (!response.ok) {
+        const detail = payload && typeof payload === "object" ? payload.detail : payload;
+        throw new Error(detail || `Request failed with status ${response.status}`);
+      }
+
+      return payload;
+    }
+
+    function setMessage(element, text = "", type = "") {
+      element.textContent = text;
+      element.className = `message ${type}`.trim();
+    }
+
+    function setAuthMode(mode) {
+      state.authMode = mode;
+      $("loginTab").classList.toggle("active", mode === "login");
+      $("registerTab").classList.toggle("active", mode === "register");
+      $("authSubmit").textContent = mode === "login" ? "Sign in" : "Create account";
+      $("password").autocomplete = mode === "login" ? "current-password" : "new-password";
+      setMessage($("authMessage"));
+    }
+
+    function setAuthenticatedUI() {
+      const loggedIn = Boolean(state.user);
+      $("authForm").classList.toggle("hidden", loggedIn);
+      $("userBox").classList.toggle("hidden", !loggedIn);
+      $("userEmail").textContent = state.user?.email || "";
+      $("uploadButton").disabled = !loggedIn;
+      $("refreshDocs").disabled = !loggedIn;
+      $("askButton").disabled = !loggedIn;
+
+      if (!loggedIn) {
+        $("documents").innerHTML = '<div class="empty">Sign in to view documents.</div>';
+        $("answerBox").classList.add("hidden");
+      }
+    }
+
+    async function restoreSession() {
+      if (!state.token) {
+        setAuthenticatedUI();
+        return;
+      }
+
+      try {
+        state.user = await api("api/auth/me");
+        setAuthenticatedUI();
+        await loadDocuments();
+      } catch {
+        localStorage.removeItem("aia_bka_token");
+        state.token = "";
+        state.user = null;
+        setAuthenticatedUI();
+      }
+    }
+
+    async function handleAuth(event) {
+      event.preventDefault();
+
+      const email = $("email").value.trim();
+      const password = $("password").value;
+
+      $("authSubmit").disabled = true;
+      setMessage($("authMessage"), state.authMode === "login" ? "Signing in..." : "Creating account...");
+
+      try {
+        if (state.authMode === "register") {
+          await api("api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+        }
+
+        const token = await api("api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        state.token = token.access_token;
+        localStorage.setItem("aia_bka_token", state.token);
+        state.user = await api("api/auth/me");
+        setAuthenticatedUI();
+        setMessage($("authMessage"), "Signed in.", "good");
+        $("password").value = "";
+        await loadDocuments();
+      } catch (error) {
+        setMessage($("authMessage"), error.message, "bad");
+      } finally {
+        $("authSubmit").disabled = false;
+      }
+    }
+
+    function logout() {
+      state.token = "";
+      state.user = null;
+      state.conversationId = null;
+      localStorage.removeItem("aia_bka_token");
+      $("conversationLabel").textContent = "New conversation";
+      setMessage($("chatMessage"));
+      setMessage($("uploadMessage"));
+      setAuthenticatedUI();
+    }
+
+    async function loadDocuments() {
+      if (!state.user) {
+        setAuthenticatedUI();
+        return;
+      }
+
+      try {
+        const payload = await api("api/documents");
+
+        if (!payload.items.length) {
+          $("documents").innerHTML = '<div class="empty">No documents yet. Upload one to begin.</div>';
+          return;
+        }
+
+        $("documents").innerHTML = payload.items.map((doc) => `
+          <div class="doc">
+            <div class="row between">
+              <div class="doc-name">${escapeHtml(doc.original_filename)}</div>
+              <span class="badge">${escapeHtml(doc.status)}</span>
+            </div>
+            <div class="doc-meta">
+              <span>${formatBytes(doc.size_bytes)}</span>
+              <span>${doc.character_count.toLocaleString()} chars</span>
+              <span>#${doc.id}</span>
+            </div>
+          </div>
+        `).join("");
+      } catch (error) {
+        $("documents").innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    async function handleUpload(event) {
+      event.preventDefault();
+
+      const file = $("fileInput").files[0];
+      if (!file) {
+        setMessage($("uploadMessage"), "Choose a file first.", "bad");
+        return;
+      }
+
+      $("uploadButton").disabled = true;
+      setMessage($("uploadMessage"), "Uploading document...");
+
+      try {
+        const form = new FormData();
+        form.append("file", file);
+
+        const document = await api("api/documents", {
+          method: "POST",
+          body: form,
+        });
+
+        setMessage($("uploadMessage"), "Document uploaded. Creating embeddings...");
+        const indexed = await api(`api/documents/${document.id}/index`, {
+          method: "POST",
+        });
+
+        setMessage(
+          $("uploadMessage"),
+          `Indexed successfully: ${indexed.chunks_created} chunks.`,
+          "good"
+        );
+
+        $("fileInput").value = "";
+        await loadDocuments();
+      } catch (error) {
+        setMessage($("uploadMessage"), error.message, "bad");
+      } finally {
+        $("uploadButton").disabled = !state.user;
+      }
+    }
+
+    async function handleAsk(event) {
+      event.preventDefault();
+
+      const question = $("question").value.trim();
+      if (!question) return;
+
+      $("askButton").disabled = true;
+      $("answerBox").classList.add("hidden");
+      setMessage($("chatMessage"), "Retrieving context and generating a grounded answer...");
+
+      try {
+        const payload = await api("api/chat/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            question,
+            conversation_id: state.conversationId,
+            top_k: 5,
+          }),
+        });
+
+        state.conversationId = payload.conversation_id;
+        $("conversationLabel").textContent = `Conversation #${payload.conversation_id}`;
+        $("answerText").textContent = payload.answer;
+
+        const badge = $("groundedBadge");
+        badge.textContent = payload.grounded ? "grounded" : "not grounded";
+        badge.style.color = payload.grounded ? "var(--good)" : "var(--warn)";
+
+        $("sources").innerHTML = payload.sources.length
+          ? payload.sources.map((source) => `
+              <div class="source">
+                <strong>[${source.reference}] ${escapeHtml(source.original_filename)}</strong><br>
+                Similarity: ${Number(source.similarity).toFixed(3)} · Chunk ${source.chunk_index}
+              </div>
+            `).join("")
+          : '<div class="source">No document sources were used for this answer.</div>';
+
+        $("answerBox").classList.remove("hidden");
+        setMessage($("chatMessage"));
+      } catch (error) {
+        setMessage($("chatMessage"), error.message, "bad");
+      } finally {
+        $("askButton").disabled = !state.user;
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes) return "0 B";
+      const units = ["B", "KB", "MB", "GB"];
+      const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+      return `${(bytes / Math.pow(1024, index)).toFixed(index ? 1 : 0)} ${units[index]}`;
+    }
+
+    $("loginTab").addEventListener("click", () => setAuthMode("login"));
+    $("registerTab").addEventListener("click", () => setAuthMode("register"));
+    $("authForm").addEventListener("submit", handleAuth);
+    $("logoutButton").addEventListener("click", logout);
+    $("uploadForm").addEventListener("submit", handleUpload);
+    $("refreshDocs").addEventListener("click", loadDocuments);
+    $("askForm").addEventListener("submit", handleAsk);
+
+    setAuthenticatedUI();
+    restoreSession();
+  </script>
+</body>
+</html>

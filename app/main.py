@@ -16,6 +16,7 @@ from app.api.documents import router as documents_router
 from app.api.health import router as health_router
 from app.api.retrieval import router as retrieval_router
 from app.api.release import router as release_router
+from app.api.ui import router as ui_router
 from app.core.config import settings
 from app.core.startup_validation import validate_startup_configuration
 from app.db.base import Base
@@ -101,6 +102,7 @@ def create_app() -> FastAPI:
             content={"detail": "Internal server error."},
         )
 
+    app.include_router(ui_router)
     app.include_router(health_router)
     app.include_router(release_router)
     app.include_router(auth_router, prefix="/api")
