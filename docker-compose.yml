@@ -11,6 +11,7 @@ services:
         condition: service_healthy
     volumes:
       - .:/app
+      - aia_knowledge_uploads:/app/uploads
 
   db:
     image: pgvector/pgvector:pg16
@@ -31,3 +32,4 @@ services:
 
 volumes:
   aia_knowledge_postgres:
+  aia_knowledge_uploads:
