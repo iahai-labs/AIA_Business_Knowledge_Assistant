@@ -11,17 +11,39 @@ def create_document(db: Session, document: Document) -> Document:
     return document
 
 
-def get_document_by_id(db: Session, document_id: int) -> Document | None:
-    return db.get(Document, document_id)
-
-
-def get_document_by_hash(db: Session, sha256: str) -> Document | None:
-    statement = select(Document).where(Document.sha256 == sha256)
+def get_document_by_id(
+    db: Session,
+    document_id: int,
+    user_id: int,
+) -> Document | None:
+    statement = select(Document).where(
+        Document.id == document_id,
+        Document.owner_user_id == user_id,
+    )
     return db.scalar(statement)
 
 
-def get_all_documents(db: Session) -> list[Document]:
-    statement = select(Document).order_by(Document.created_at.desc())
+def get_document_by_hash(
+    db: Session,
+    sha256: str,
+    user_id: int,
+) -> Document | None:
+    statement = select(Document).where(
+        Document.sha256 == sha256,
+        Document.owner_user_id == user_id,
+    )
+    return db.scalar(statement)
+
+
+def get_all_documents(
+    db: Session,
+    user_id: int,
+) -> list[Document]:
+    statement = (
+        select(Document)
+        .where(Document.owner_user_id == user_id)
+        .order_by(Document.created_at.desc())
+    )
     return list(db.scalars(statement).all())
 
 

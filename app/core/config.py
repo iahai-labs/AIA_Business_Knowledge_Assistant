@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "AIA Business Knowledge Assistant"
-    app_version: str = "0.4.0"
+    app_version: str = "0.5.0"
     environment: str = "development"
     debug: bool = True
 
@@ -29,10 +29,14 @@ class Settings(BaseSettings):
 
     groq_api_key: str = ""
     groq_base_url: str = "https://api.groq.com/openai/v1"
-    groq_model: str = "llama-3.1-8b-instant"
+    groq_model: str = "openai/gpt-oss-120b"
     groq_timeout_seconds: float = 45.0
     answer_temperature: float = 0.1
     max_context_chunks: int = 5
+
+    jwt_secret_key: str = ""
+    jwt_algorithm: str = "HS256"
+    jwt_access_token_minutes: int = 60
 
     model_config = SettingsConfigDict(
         env_file=".env",

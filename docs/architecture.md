@@ -1,59 +1,72 @@
 # Architecture
 
-## Version 0.4.0 Scope
+## Version 0.5.0 Scope
 
-Version 0.4.0 adds grounded answer generation, source citations, confidence filtering, and conversation persistence.
+Version 0.5.0 adds authentication and user ownership to the existing RAG system.
 
-## End-to-End RAG Flow
+## Authentication Flow
 
 ```text
-User Question
-     |
-     v
-Jina Query Embedding
-     |
-     v
-PostgreSQL + pgvector
-     |
-     v
-Top-K Retrieval
-     |
-     v
-Minimum Similarity Filter
-     |
-     +---- no trusted context ----> Safe "not enough information" response
-     |
-     v
-Context Builder
-     |
-     v
-Groq Chat Completion
-     |
-     v
-Grounded Answer + Inline [n] Citations
-     |
-     v
-Conversation + Message Persistence
+Register
+   |
+   v
+Argon2 Password Hash
+   |
+   v
+User Record
+
+Login
+   |
+   v
+Password Verification
+   |
+   v
+JWT Access Token
+   |
+   v
+Bearer Authentication
 ```
 
-## Provider Separation
+## Ownership Boundary
 
-- Jina: embeddings and semantic retrieval
-- PostgreSQL + pgvector: vector storage and ranking
-- Groq: grounded answer generation
+```text
+User A
+  |
+  +-- Documents A
+  |     |
+  |     +-- Chunks A
+  |
+  +-- Conversations A
+        |
+        +-- Messages A
 
-This avoids vendor lock-in and lets each provider serve a specific role.
+User B
+  |
+  +-- Documents B
+  |     |
+  |     +-- Chunks B
+  |
+  +-- Conversations B
+        |
+        +-- Messages B
+```
 
-## Grounding Rule
+All document retrieval, semantic retrieval, chat access, and conversation-history reads are scoped by the authenticated user's ID.
 
-The LLM receives an explicit instruction to answer only from retrieved context. It must state that there is not enough indexed information when context is insufficient.
+## Security Properties
 
-## Similarity Threshold
+- passwords are never stored in plaintext
+- Argon2 password hashing
+- JWT access tokens with expiration
+- inactive accounts are rejected
+- protected routes require bearer authentication
+- document lookup is owner-scoped
+- semantic retrieval joins through the authenticated user's documents
+- conversation lookup is owner-scoped
+- cross-user resources intentionally return not found
 
-Low-similarity chunks are removed before context construction. The default threshold is configurable with `RETRIEVAL_MIN_SIMILARITY`.
+## Legacy Data
 
-The threshold is a tuning parameter, not a universal confidence probability.
+Existing v0.4.0 documents and conversations have no owner. The migration intentionally leaves their new owner fields null.
 
-## Conversation Persistence
-
-Each `/api/chat/ask` request creates a conversation when no `conversation_id` is supplied. User and assistant messages are stored in PostgreSQL.
+They are therefore invisible to authenticated users until reassigned or recreated. This avoids accidentally exposing legacy resources to a new account.

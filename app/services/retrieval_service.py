@@ -10,6 +10,7 @@ def search_chunks(
     db: Session,
     query: str,
     top_k: int,
+    user_id: int,
     min_similarity: float | None = None,
 ) -> RetrievalResponse:
     threshold = (
@@ -19,10 +20,12 @@ def search_chunks(
     )
 
     query_embedding = embed_query(query)
+
     rows = semantic_search(
         db=db,
         query_embedding=query_embedding,
         top_k=top_k,
+        user_id=user_id,
     )
 
     hits = []

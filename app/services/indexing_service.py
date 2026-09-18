@@ -12,8 +12,16 @@ class DocumentIndexingError(RuntimeError):
     pass
 
 
-def index_document(db: Session, document_id: int) -> dict[str, int | str]:
-    document = get_document(db, document_id)
+def index_document(
+    db: Session,
+    document_id: int,
+    user_id: int,
+) -> dict[str, int | str]:
+    document = get_document(
+        db=db,
+        document_id=document_id,
+        user_id=user_id,
+    )
 
     chunks = split_text(document.extracted_text)
 

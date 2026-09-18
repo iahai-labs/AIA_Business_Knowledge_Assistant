@@ -24,11 +24,20 @@ def _get_or_create_conversation(
     db: Session,
     conversation_id: int | None,
     question: str,
+    user_id: int,
 ):
     if conversation_id is None:
-        return create_conversation(db, title=question)
+        return create_conversation(
+            db=db,
+            user_id=user_id,
+            title=question,
+        )
 
-    conversation = get_conversation(db, conversation_id)
+    conversation = get_conversation(
+        db=db,
+        conversation_id=conversation_id,
+        user_id=user_id,
+    )
 
     if conversation is None:
         raise ConversationNotFoundError(
@@ -54,6 +63,7 @@ def _build_context(hits) -> str:
 def ask_knowledge_base(
     db: Session,
     question: str,
+    user_id: int,
     conversation_id: int | None,
     top_k: int,
     min_similarity: float | None,
@@ -62,6 +72,7 @@ def ask_knowledge_base(
         db=db,
         conversation_id=conversation_id,
         question=question,
+        user_id=user_id,
     )
 
     add_message(
@@ -75,6 +86,7 @@ def ask_knowledge_base(
         db=db,
         query=question,
         top_k=min(top_k, settings.max_context_chunks),
+        user_id=user_id,
         min_similarity=min_similarity,
     )
 
@@ -125,8 +137,13 @@ def ask_knowledge_base(
 def get_conversation_history(
     db: Session,
     conversation_id: int,
+    user_id: int,
 ) -> ConversationHistoryResponse:
-    conversation = get_conversation(db, conversation_id)
+    conversation = get_conversation(
+        db=db,
+        conversation_id=conversation_id,
+        user_id=user_id,
+    )
 
     if conversation is None:
         raise ConversationNotFoundError(

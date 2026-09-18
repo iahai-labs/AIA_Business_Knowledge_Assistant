@@ -69,7 +69,11 @@ def _extract_text(path: Path, extension: str) -> tuple[str, int | None]:
     raise DocumentValidationError("No text extractor is configured for this file type.")
 
 
-async def ingest_document(db: Session, file: UploadFile) -> Document:
+async def ingest_document(
+    db: Session,
+    file: UploadFile,
+    user_id: int,
+) -> Document:
     original_filename = file.filename or "unnamed"
     extension = _validate_extension(original_filename)
 
@@ -77,7 +81,7 @@ async def ingest_document(db: Session, file: UploadFile) -> Document:
     _validate_size(content)
 
     file_hash = hashlib.sha256(content).hexdigest()
-    existing = get_document_by_hash(db, file_hash)
+    existing = get_document_by_hash(db, file_hash, user_id)
 
     if existing:
         raise DocumentValidationError(
@@ -100,6 +104,7 @@ async def ingest_document(db: Session, file: UploadFile) -> Document:
             )
 
         document = Document(
+            owner_user_id=user_id,
             original_filename=original_filename,
             stored_filename=stored_filename,
             content_type=file.content_type,
@@ -118,12 +123,19 @@ async def ingest_document(db: Session, file: UploadFile) -> Document:
         raise
 
 
-def list_documents(db: Session) -> list[Document]:
-    return get_all_documents(db)
+def list_documents(
+    db: Session,
+    user_id: int,
+) -> list[Document]:
+    return get_all_documents(db, user_id)
 
 
-def get_document(db: Session, document_id: int) -> Document:
-    document = get_document_by_id(db, document_id)
+def get_document(
+    db: Session,
+    document_id: int,
+    user_id: int,
+) -> Document:
+    document = get_document_by_id(db, document_id, user_id)
 
     if document is None:
         raise DocumentNotFoundError(f"Document {document_id} was not found.")
@@ -131,8 +143,12 @@ def get_document(db: Session, document_id: int) -> Document:
     return document
 
 
-def delete_document(db: Session, document_id: int) -> None:
-    document = get_document(db, document_id)
+def delete_document(
+    db: Session,
+    document_id: int,
+    user_id: int,
+) -> None:
+    document = get_document(db, document_id, user_id)
 
     stored_path = Path(settings.upload_dir) / document.stored_filename
     stored_path.unlink(missing_ok=True)

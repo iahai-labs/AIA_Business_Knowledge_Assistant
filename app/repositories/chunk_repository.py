@@ -1,6 +1,7 @@
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
+from app.models.document import Document
 from app.models.document_chunk import DocumentChunk
 
 
@@ -25,11 +26,14 @@ def semantic_search(
     db: Session,
     query_embedding: list[float],
     top_k: int,
+    user_id: int,
 ) -> list[tuple[DocumentChunk, float]]:
     distance = DocumentChunk.embedding.cosine_distance(query_embedding).label("distance")
 
     statement = (
         select(DocumentChunk, distance)
+        .join(Document, Document.id == DocumentChunk.document_id)
+        .where(Document.owner_user_id == user_id)
         .order_by(distance)
         .limit(top_k)
     )

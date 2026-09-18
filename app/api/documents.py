@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db
+from app.api.deps import get_current_user, get_db
+from app.models.user import User
 from app.schemas.document import (
     DocumentIndexResponse,
     DocumentListResponse,
@@ -29,9 +30,14 @@ router = APIRouter(prefix="/documents", tags=["documents"])
 async def upload_document(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> DocumentResponse:
     try:
-        document = await ingest_document(db=db, file=file)
+        document = await ingest_document(
+            db=db,
+            file=file,
+            user_id=current_user.id,
+        )
         return DocumentResponse.model_validate(document)
     except DocumentValidationError as exc:
         raise HTTPException(
@@ -41,8 +47,12 @@ async def upload_document(
 
 
 @router.get("", response_model=DocumentListResponse)
-def get_documents(db: Session = Depends(get_db)) -> DocumentListResponse:
-    documents = list_documents(db)
+def get_documents(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> DocumentListResponse:
+    documents = list_documents(db, current_user.id)
+
     return DocumentListResponse(
         items=[DocumentResponse.model_validate(item) for item in documents],
         total=len(documents),
@@ -53,9 +63,15 @@ def get_documents(db: Session = Depends(get_db)) -> DocumentListResponse:
 def get_document_by_id(
     document_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> DocumentResponse:
     try:
-        return DocumentResponse.model_validate(get_document(db, document_id))
+        document = get_document(
+            db=db,
+            document_id=document_id,
+            user_id=current_user.id,
+        )
+        return DocumentResponse.model_validate(document)
     except DocumentNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -70,9 +86,16 @@ def get_document_by_id(
 def index_document_by_id(
     document_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> DocumentIndexResponse:
     try:
-        return DocumentIndexResponse(**index_document(db, document_id))
+        return DocumentIndexResponse(
+            **index_document(
+                db=db,
+                document_id=document_id,
+                user_id=current_user.id,
+            )
+        )
     except DocumentNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -89,9 +112,14 @@ def index_document_by_id(
 def remove_document(
     document_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> None:
     try:
-        delete_document(db, document_id)
+        delete_document(
+            db=db,
+            document_id=document_id,
+            user_id=current_user.id,
+        )
     except DocumentNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

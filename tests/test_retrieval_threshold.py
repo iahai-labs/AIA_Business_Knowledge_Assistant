@@ -1,4 +1,3 @@
-from app.schemas.retrieval import RetrievalHit
 from app.services import retrieval_service
 
 
@@ -26,13 +25,14 @@ def test_retrieval_filters_low_similarity(monkeypatch) -> None:
     monkeypatch.setattr(
         retrieval_service,
         "semantic_search",
-        lambda db, query_embedding, top_k: rows,
+        lambda db, query_embedding, top_k, user_id: rows,
     )
 
     response = retrieval_service.search_chunks(
         db=None,
         query="business automation",
         top_k=5,
+        user_id=7,
         min_similarity=0.5,
     )
 
