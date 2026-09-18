@@ -1,0 +1,7 @@
+AIA Studio Automation Services
+
+AIA Studio can automate repetitive business tasks such as lead routing, follow-up reminders, form processing, internal notifications, customer support triage, and synchronization between business tools.
+
+Automation projects begin with a workflow review. The goal is to reduce manual work while keeping human review for sensitive or high-impact actions.
+
+AI components are added only when they provide practical value.

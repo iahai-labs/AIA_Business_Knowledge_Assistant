@@ -55,6 +55,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
         return response
 
+
 class RequestBodyLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         content_length = request.headers.get("content-length")
