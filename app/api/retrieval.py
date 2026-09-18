@@ -19,6 +19,7 @@ def semantic_search(
             db=db,
             query=payload.query,
             top_k=payload.top_k,
+            min_similarity=payload.min_similarity,
         )
     except EmbeddingProviderError as exc:
         raise HTTPException(

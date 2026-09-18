@@ -1,53 +1,59 @@
 # Architecture
 
-## Version 0.3.1 Scope
+## Version 0.4.0 Scope
 
-Version 0.3.1 replaces OpenAI embeddings with a dedicated Jina embedding provider while preserving PostgreSQL + pgvector retrieval.
+Version 0.4.0 adds grounded answer generation, source citations, confidence filtering, and conversation persistence.
 
-## Retrieval Architecture
+## End-to-End RAG Flow
 
 ```text
-Business Documents
-        |
-        v
-Text Extraction
-        |
-        v
-Chunking
-        |
-        v
-Jina Embeddings API
-  retrieval.passage
-        |
-        v
+User Question
+     |
+     v
+Jina Query Embedding
+     |
+     v
 PostgreSQL + pgvector
-        |
-        v
-User Query
-        |
-        v
-Jina Embeddings API
-  retrieval.query
-        |
-        v
-Cosine Similarity Search
-        |
-        v
-Top-K Relevant Chunks
+     |
+     v
+Top-K Retrieval
+     |
+     v
+Minimum Similarity Filter
+     |
+     +---- no trusted context ----> Safe "not enough information" response
+     |
+     v
+Context Builder
+     |
+     v
+Groq Chat Completion
+     |
+     v
+Grounded Answer + Inline [n] Citations
+     |
+     v
+Conversation + Message Persistence
 ```
 
 ## Provider Separation
 
-Embedding generation is isolated behind the embedding service. The future answer-generation layer can therefore use a different LLM provider such as Groq without changing vector retrieval.
+- Jina: embeddings and semantic retrieval
+- PostgreSQL + pgvector: vector storage and ranking
+- Groq: grounded answer generation
 
-## Vector Dimension
+This avoids vendor lock-in and lets each provider serve a specific role.
 
-`jina-embeddings-v5-text-small` produces 1024-dimensional embeddings by default and supports Matryoshka dimensions. This release uses 1024 dimensions.
+## Grounding Rule
 
-## Upgrade Note
+The LLM receives an explicit instruction to answer only from retrieved context. It must state that there is not enough indexed information when context is insufficient.
 
-Version 0.3.0 used a 1536-dimensional vector column. PostgreSQL does not automatically change an existing vector column when SQLAlchemy metadata changes.
+## Similarity Threshold
 
-Because v0.3.0 never produced successful embeddings in this development environment, drop and recreate only the `document_chunks` table before starting v0.3.1.
+Low-similarity chunks are removed before context construction. The default threshold is configurable with `RETRIEVAL_MIN_SIMILARITY`.
 
-The original `documents` table and uploaded-document metadata remain intact.
+The threshold is a tuning parameter, not a universal confidence probability.
+
+## Conversation Persistence
+
+Each `/api/chat/ask` request creates a conversation when no `conversation_id` is supplied. User and assistant messages are stored in PostgreSQL.

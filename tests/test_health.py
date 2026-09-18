@@ -13,4 +13,4 @@ def test_health_check() -> None:
 
     assert payload["status"] == "ok"
     assert payload["service"] == "AIA Business Knowledge Assistant"
-    assert payload["version"] == "0.3.1"
+    assert payload["version"] == "0.4.0"

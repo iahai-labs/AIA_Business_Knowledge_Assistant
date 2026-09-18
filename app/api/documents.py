@@ -55,8 +55,7 @@ def get_document_by_id(
     db: Session = Depends(get_db),
 ) -> DocumentResponse:
     try:
-        document = get_document(db, document_id)
-        return DocumentResponse.model_validate(document)
+        return DocumentResponse.model_validate(get_document(db, document_id))
     except DocumentNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
