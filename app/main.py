@@ -3,8 +3,10 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 import app.models  # noqa: F401
 from app.api.admin import router as admin_router
@@ -14,9 +16,15 @@ from app.api.documents import router as documents_router
 from app.api.health import router as health_router
 from app.api.retrieval import router as retrieval_router
 from app.core.config import settings
+from app.core.startup_validation import validate_startup_configuration
 from app.db.base import Base
 from app.db.session import engine
 from app.middleware.observability import ObservabilityMiddleware
+from app.middleware.security import (
+    InMemoryRateLimitMiddleware,
+    RequestBodyLimitMiddleware,
+    SecurityHeadersMiddleware,
+)
 from app.observability.logging import configure_logging
 
 configure_logging()
@@ -25,6 +33,8 @@ logger = logging.getLogger("aia.app")
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    validate_startup_configuration()
+
     Path(settings.upload_dir).mkdir(parents=True, exist_ok=True)
 
     with engine.begin() as connection:
@@ -54,6 +64,20 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origin_list,
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "DELETE"],
+        allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+    )
+    app.add_middleware(
+        TrustedHostMiddleware,
+        allowed_hosts=settings.trusted_host_list,
+    )
+    app.add_middleware(SecurityHeadersMiddleware)
+    app.add_middleware(RequestBodyLimitMiddleware)
+    app.add_middleware(InMemoryRateLimitMiddleware)
     app.add_middleware(ObservabilityMiddleware)
 
     @app.exception_handler(Exception)
@@ -73,9 +97,7 @@ def create_app() -> FastAPI:
 
         return JSONResponse(
             status_code=500,
-            content={
-                "detail": "Internal server error.",
-            },
+            content={"detail": "Internal server error."},
         )
 
     app.include_router(health_router)

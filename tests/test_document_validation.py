@@ -1,6 +1,7 @@
 from app.services.document_service import (
     DocumentValidationError,
     _validate_extension,
+    _validate_mime_type,
     _validate_size,
 )
 
@@ -10,16 +11,19 @@ def test_validate_extension_accepts_pdf() -> None:
 
 
 def test_validate_extension_rejects_executable() -> None:
-    try:
+    with __import__("pytest").raises(DocumentValidationError):
         _validate_extension("payload.exe")
-        assert False, "Expected DocumentValidationError"
-    except DocumentValidationError:
-        assert True
 
 
 def test_validate_size_rejects_empty_file() -> None:
-    try:
+    with __import__("pytest").raises(DocumentValidationError):
         _validate_size(b"")
-        assert False, "Expected DocumentValidationError"
-    except DocumentValidationError:
-        assert True
+
+
+def test_validate_mime_type_accepts_pdf() -> None:
+    _validate_mime_type("application/pdf")
+
+
+def test_validate_mime_type_rejects_binary() -> None:
+    with __import__("pytest").raises(DocumentValidationError):
+        _validate_mime_type("application/octet-stream")

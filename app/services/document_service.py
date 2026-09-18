@@ -69,6 +69,19 @@ def _extract_text(path: Path, extension: str) -> tuple[str, int | None]:
     raise DocumentValidationError("No text extractor is configured for this file type.")
 
 
+def _validate_mime_type(content_type: str | None) -> None:
+    if not content_type:
+        return
+
+    normalized = content_type.split(";", 1)[0].strip().lower()
+
+    if normalized not in settings.allowed_mime_type_set:
+        allowed = ", ".join(sorted(settings.allowed_mime_type_set))
+        raise DocumentValidationError(
+            f"Unsupported MIME type '{normalized}'. Allowed: {allowed}"
+        )
+
+
 async def ingest_document(
     db: Session,
     file: UploadFile,
@@ -76,6 +89,7 @@ async def ingest_document(
 ) -> Document:
     original_filename = file.filename or "unnamed"
     extension = _validate_extension(original_filename)
+    _validate_mime_type(file.content_type)
 
     content = await file.read()
     _validate_size(content)

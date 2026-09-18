@@ -1,34 +1,48 @@
 # Changelog
 
+## [0.8.0] - 2026-09-18
+
+### Added
+
+- Alembic migration infrastructure
+- production startup configuration validation
+- MIME-type upload validation
+- request body size limits
+- in-memory API rate limiting
+- explicit CORS policy
+- trusted-host validation
+- security headers middleware
+- optional HSTS
+- non-root Docker execution
+- dropped Linux capabilities
+- container health check
+- security-hardening documentation
+- rate-limit tests
+- startup validation tests
+- MIME validation tests
+
+### Changed
+
+- Docker image now runs as an unprivileged user
+- future schema changes should use Alembic
+- application startup validates production security settings
+
+### Security
+
+- basic abuse resistance through bounded request rates
+- stricter upload validation
+- safer browser-facing response headers
+- stricter production environment validation
+
 ## [0.7.0] - 2026-09-18
 
 ### Added
 
-- request ID generation and propagation
-- request duration response headers
-- structured JSON application logging
-- sensitive-key redaction helper
-- request latency and error metrics
-- admin runtime metrics endpoint
-- provider retry policy with exponential backoff
-- transient Jina retry handling
-- transient Groq retry handling
-- provider configuration health endpoint
-- application readiness endpoint
-- observability and reliability documentation
-- reliability unit tests
-
-### Changed
-
-- Jina provider calls now use bounded retries for transient failures
-- Groq provider calls now use bounded retries for transient failures
-- Uvicorn access logging is replaced by application request logs
-
-### Reliability
-
-- retryable provider failures include timeout, connection, HTTP 408, 425, 429, and 5xx conditions
-- slow requests are logged at warning level
-- unhandled exceptions return a generic internal error response
+- observability
+- request IDs
+- structured logging
+- provider retry handling
+- readiness checks
 
 ## [0.6.0] - 2026-09-18
 
@@ -36,7 +50,6 @@
 
 - admin workflows
 - operational visibility
-- administrator authorization
 
 ## [0.5.0] - 2026-09-18
 
@@ -44,22 +57,21 @@
 
 - authentication
 - user ownership
-- JWT access tokens
 
 ## [0.4.0] - 2026-09-18
 
 ### Added
 
 - grounded RAG
-- Groq answers
-- citations
+- Groq answer generation
+- source citations
 
 ## [0.3.1] - 2026-09-18
 
 ### Added
 
 - Jina embeddings
-- semantic retrieval
+- pgvector semantic retrieval
 
 ## [0.2.1] - 2026-09-18
 

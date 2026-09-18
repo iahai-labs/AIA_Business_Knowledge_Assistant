@@ -120,3 +120,34 @@ Structured Log + Runtime Metrics
 ```
 
 The reliability layer is intentionally simple and dependency-light so it remains easy to understand in a portfolio review.
+
+
+## v0.8.0 Security Boundary
+
+```text
+Client
+  |
+  v
+Trusted Host Check
+  |
+  v
+CORS Policy
+  |
+  v
+Request Size Limit
+  |
+  v
+Rate Limit
+  |
+  v
+Security Headers + Request Tracing
+  |
+  v
+Authenticated Application
+  |
+  +--> Owner-scoped data
+  +--> Admin-scoped operations
+  +--> Jina / Groq through bounded provider clients
+```
+
+Alembic is the migration source of truth from this release forward.

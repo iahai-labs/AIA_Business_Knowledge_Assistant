@@ -58,3 +58,10 @@ Admin endpoints are read-only in v0.6.0 and do not expose password hashes or app
 Observability logs must not intentionally include passwords, access tokens, API keys, JWT secrets, or password hashes.
 
 Known sensitive dictionary keys are redacted by the logging helper. Application code should still avoid logging raw request bodies and credentials.
+
+
+## v0.8.0 Hardening
+
+Additional controls now include MIME validation, request-size limits, trusted-host enforcement, explicit CORS configuration, rate limiting, security headers, production startup validation, and non-root Docker execution.
+
+Future production deployments should move rate limiting to shared infrastructure when more than one application process is used.

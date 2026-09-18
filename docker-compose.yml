@@ -12,6 +12,11 @@ services:
     volumes:
       - .:/app
       - aia_knowledge_uploads:/app/uploads
+    read_only: false
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
 
   db:
     image: pgvector/pgvector:pg16

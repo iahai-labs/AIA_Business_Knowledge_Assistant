@@ -4,90 +4,71 @@ A production-minded, multi-user RAG knowledge system for small and medium busine
 
 ## Current Release
 
-**v0.7.0 — Observability + Reliability**
+**v0.8.0 — Security + Production Hardening**
 
-This release adds request tracing, structured logging, provider retries, readiness checks, and lightweight runtime metrics.
+This release adds application security controls, Docker hardening, startup validation, and Alembic migration management.
 
 ## Architecture
 
 ```text
-Authenticated User
-      |
-      v
+Client
+  |
+  v
+Security Middleware
+  |
+  +--> Trusted Hosts
+  +--> CORS
+  +--> Request Size Limit
+  +--> Rate Limit
+  +--> Security Headers
+  +--> Request Tracing
+  |
+  v
 FastAPI
-      |
-      +--> Request ID + Timing
-      |
-      +--> User-owned RAG
-      |       |
-      |       +--> Jina Embeddings
-      |       +--> pgvector
-      |       +--> Groq Grounded Answers
-      |
-      +--> Admin Workflows
-      |
-      v
+  |
+  +--> Auth + Ownership
+  +--> Jina + pgvector
+  +--> Groq Grounded RAG
+  +--> Admin Workflows
+  |
+  v
 Structured Logs + Runtime Metrics
 ```
 
-## Current Capabilities
+## Security Controls
 
-- email/password authentication
 - Argon2 password hashing
-- JWT bearer authentication
-- per-user document ownership
-- per-user retrieval isolation
-- Jina embeddings
-- PostgreSQL + pgvector
-- Groq grounded answers
-- source metadata
-- safe no-context behavior
-- conversation persistence
-- read-only admin workflows
-- request IDs
-- request latency headers
-- JSON structured logging
-- sensitive-key redaction
-- bounded provider retries
-- provider timeout handling
-- database health check
-- provider configuration health
-- readiness endpoint
-- admin runtime metrics
-- automated reliability tests
+- JWT authentication
+- user ownership isolation
+- admin authorization
+- upload extension validation
+- MIME allowlist
+- request body size limit
+- rate limiting
+- explicit CORS policy
+- trusted-host validation
+- security headers
+- optional HSTS
+- production startup validation
+- privacy-conscious logs
+- non-root Docker user
+- dropped Linux capabilities
+- container health check
 
-## Health and Readiness
+## Database Migrations
 
-```text
-GET /health
-GET /health/db
-GET /health/providers
-GET /ready
-```
+Alembic is now the migration source of truth.
 
-## Runtime Metrics
-
-Admin-only:
-
-```text
-GET /api/admin/metrics
-```
-
-## Request Diagnostics
-
-Responses include:
-
-```text
-X-Request-ID
-X-Process-Time-Ms
-```
-
-Use the request ID to correlate client failures with application logs.
-
-## Logs
+For an existing v0.7.0 database:
 
 ```powershell
-docker compose logs app -f
+docker compose exec app alembic stamp 0001
+```
+
+Future releases:
+
+```powershell
+docker compose exec app alembic upgrade head
 ```
 
 ## Upgrade
@@ -95,10 +76,8 @@ docker compose logs app -f
 Read:
 
 ```text
-docs/upgrade-v0.7.0.md
+docs/upgrade-v0.8.0.md
 ```
-
-No database schema migration is required for this release.
 
 ## Tests
 
