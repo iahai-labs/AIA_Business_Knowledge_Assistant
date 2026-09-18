@@ -4,41 +4,47 @@ A production-minded AI knowledge system for small and medium businesses.
 
 ## Business Problem
 
-Business information is often scattered across PDF files, internal guides, policies, product documents, and support material. Employees and customers waste time searching for reliable answers, and generic AI assistants may produce responses that are not grounded in the company's actual knowledge.
+Business information is often scattered across PDFs, internal guides, policies, product documents, and support material. Employees and customers waste time searching for reliable answers, while generic AI assistants may respond without grounding in the company's actual knowledge.
 
 ## Solution
 
-AIA Business Knowledge Assistant will turn business documents into a searchable knowledge system that can answer questions using retrieved source material and provide source references for each grounded answer.
+AIA Business Knowledge Assistant turns business documents into a searchable knowledge system. The final portfolio release will answer questions using retrieved company knowledge and provide source references.
 
 ## Current Release
 
-**v0.1.0 — Foundation**
+**v0.2.0 — Document Ingestion**
 
-This release provides:
+This release adds:
 
-- FastAPI backend
-- centralized configuration
-- PostgreSQL connectivity
-- pgvector-ready database
-- Docker Compose development environment
-- health endpoints
-- automated test baseline
-- project documentation
+- document upload API
+- PDF, TXT, and Markdown support
+- file extension allowlist
+- upload size validation
+- SHA-256 duplicate detection
+- server-generated storage filenames
+- PDF text extraction
+- document metadata persistence
+- extracted text persistence
+- list, detail, and delete document endpoints
+- document validation tests
 
-## Planned Capabilities
+## API Endpoints
 
-- document upload
-- file validation
-- text extraction
-- chunking
-- embeddings
-- vector retrieval
-- grounded AI answers
-- source citations
-- conversation history
-- authentication
-- admin workflows
-- deployment behind Nginx
+```text
+GET     /health
+GET     /health/db
+
+POST    /api/documents
+GET     /api/documents
+GET     /api/documents/{document_id}
+DELETE  /api/documents/{document_id}
+```
+
+Interactive API documentation is available at:
+
+```text
+http://localhost:8000/docs
+```
 
 ## Tech Stack
 
@@ -46,7 +52,8 @@ This release provides:
 - FastAPI
 - SQLAlchemy 2
 - PostgreSQL
-- pgvector
+- pgvector-ready PostgreSQL image
+- PyPDF
 - Docker
 - Docker Compose
 - pytest
@@ -55,14 +62,16 @@ This release provides:
 
 ### 1. Create environment file
 
-```bash
-cp .env.example .env
-```
-
 Windows PowerShell:
 
 ```powershell
 Copy-Item .env.example .env
+```
+
+Linux/macOS:
+
+```bash
+cp .env.example .env
 ```
 
 ### 2. Start the project
@@ -71,43 +80,47 @@ Copy-Item .env.example .env
 docker compose up --build
 ```
 
-### 3. Check health
-
-Open:
-
-```text
-http://localhost:8000/health
-```
-
-Expected response:
-
-```json
-{
-  "status": "ok",
-  "service": "AIA Business Knowledge Assistant",
-  "version": "0.1.0"
-}
-```
-
-### 4. Check database health
-
-```text
-http://localhost:8000/health/db
-```
-
-### 5. Run tests
+### 3. Run tests
 
 ```bash
 docker compose exec app pytest
 ```
 
+### 4. Upload a document
+
+Use Swagger UI:
+
+```text
+http://localhost:8000/docs
+```
+
+Open `POST /api/documents`, choose a PDF, TXT, or Markdown file, and execute the request.
+
 ## Security Baseline
 
-- secrets are loaded from environment variables
-- `.env` is ignored by Git
-- production debug mode must be disabled
-- no API key should ever be committed
-- database credentials must be replaced before deployment
+- `.env` and runtime uploads are excluded from Git
+- upload extensions use an explicit allowlist
+- file size is limited
+- storage filenames are generated on the server
+- raw user filenames are not used as paths
+- duplicate content is detected using SHA-256
+- API credentials should never be committed
+
+## Repository Structure
+
+```text
+app/
+  api/
+  core/
+  db/
+  models/
+  repositories/
+  schemas/
+  services/
+docs/
+tests/
+uploads/          # runtime only, not committed
+```
 
 ## Roadmap
 

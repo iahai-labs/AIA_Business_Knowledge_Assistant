@@ -1,44 +1,80 @@
 # Architecture
 
-## Current Scope
+## Version 0.2.0 Scope
 
-Version 0.1.0 establishes the project foundation:
-
-- FastAPI application
-- Central configuration
-- PostgreSQL connectivity
-- Docker development environment
-- Health endpoints
-- Automated test baseline
+Version 0.2.0 adds document ingestion to the project foundation.
 
 ## High-Level Architecture
 
 ```text
-Browser / API Client
-        |
-        v
-     FastAPI
-        |
-        +--> API Routes
-        |
-        +--> Services (future)
-        |
-        +--> Repository Layer (future)
-        |
-        v
-   PostgreSQL + pgvector
+Client
+  |
+  v
+FastAPI
+  |
+  +--> Health API
+  |
+  +--> Documents API
+          |
+          v
+     Document Service
+          |
+          +--> Validation
+          +--> Local File Storage
+          +--> Text Extraction
+          |
+          v
+     Repository Layer
+          |
+          v
+      PostgreSQL
 ```
 
-## Future Layers
+## Document Ingestion Flow
 
-Later releases will introduce:
+```text
+Upload
+  |
+  v
+Validate extension
+  |
+  v
+Validate file size
+  |
+  v
+SHA-256 duplicate check
+  |
+  v
+Store file
+  |
+  v
+Extract text
+  |
+  v
+Store document metadata + extracted text
+```
 
-- document ingestion
-- text extraction
-- chunking
+## Supported Formats
+
+- PDF
+- TXT
+- Markdown
+
+## Security Notes
+
+- executable files are rejected by extension allowlist
+- upload size is limited
+- stored filenames are generated server-side
+- original user filenames are never used as storage paths
+- uploaded files are excluded from Git
+- SHA-256 is used for duplicate detection
+
+## Next Architecture Step
+
+Version 0.3.0 will introduce:
+
+- document chunking
 - embeddings
-- vector retrieval
-- grounded answer generation
-- source citations
-- authentication
-- admin workflows
+- pgvector columns
+- vector similarity retrieval
+- retrieval tests

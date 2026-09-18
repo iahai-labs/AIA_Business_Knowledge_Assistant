@@ -2,16 +2,22 @@
 
 ## ADR-001 — FastAPI
 
-FastAPI is used as the backend framework because the project is API-oriented, Python-based, and expected to integrate AI and document-processing services.
+FastAPI remains the backend framework.
 
 ## ADR-002 — PostgreSQL + pgvector
 
-PostgreSQL is the primary relational database. The pgvector extension will be used for vector similarity search so structured business data and vector data can remain in the same database for the first production-ready iteration.
+PostgreSQL remains the primary data store. Vector support will be activated in the RAG milestone.
 
-## ADR-003 — Server-rendered UI First
+## ADR-003 — Local Storage for Portfolio Demo
 
-The first portfolio release will prefer a lightweight server-rendered interface before considering a separate frontend framework.
+Uploaded files are stored on local disk for the portfolio demo. This keeps the deployment simple while preserving a clear abstraction boundary for future object storage.
 
-## ADR-004 — Monolith First
+For a larger production deployment, this can be replaced with S3-compatible object storage.
 
-The project starts as a modular monolith. Microservices are intentionally deferred until there is a real operational need.
+## ADR-004 — SHA-256 Duplicate Detection
+
+The ingestion pipeline hashes file contents and rejects duplicate documents.
+
+## ADR-005 — Allowlist File Validation
+
+Version 0.2.0 accepts PDF, TXT, and Markdown files only. Additional formats must be explicitly introduced with their own text extractors and validation rules.
