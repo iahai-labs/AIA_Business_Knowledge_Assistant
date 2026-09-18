@@ -5,10 +5,15 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "AIA Business Knowledge Assistant"
-    app_version: str = "0.1.0"
+    app_version: str = "0.2.1"
     environment: str = "development"
     debug: bool = True
+
     database_url: str = "postgresql+psycopg://aia:aia@db:5432/aia_knowledge"
+
+    upload_dir: str = "uploads"
+    max_upload_mb: int = 10
+    allowed_extensions: str = ".pdf,.txt,.md"
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -16,6 +21,14 @@ class Settings(BaseSettings):
         case_sensitive=False,
         extra="ignore",
     )
+
+    @property
+    def allowed_extension_set(self) -> set[str]:
+        return {
+            item.strip().lower()
+            for item in self.allowed_extensions.split(",")
+            if item.strip()
+        }
 
 
 @lru_cache

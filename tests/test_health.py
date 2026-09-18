@@ -7,8 +7,10 @@ client = TestClient(app)
 
 def test_health_check() -> None:
     response = client.get("/health")
+
     assert response.status_code == 200
     payload = response.json()
+
     assert payload["status"] == "ok"
     assert payload["service"] == "AIA Business Knowledge Assistant"
-    assert payload["version"] == "0.1.0"
+    assert payload["version"] == "0.2.1"
