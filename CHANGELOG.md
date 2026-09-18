@@ -1,36 +1,38 @@
 # Changelog
 
+## [0.6.0] - 2026-09-18
+
+### Added
+
+- administrator flag on users
+- administrator authorization dependency
+- read-only admin API
+- system aggregate statistics
+- admin user overview with document/conversation counts
+- admin document overview with owner and chunk counts
+- admin conversation overview with owner and message counts
+- v0.5.0 to v0.6.0 database migration
+- admin authorization tests
+- admin response safety test
+- admin workflow documentation
+
+### Security
+
+- admin status is checked server-side from the current database user
+- non-admin authenticated users receive HTTP 403
+- admin user responses never expose password hashes
+- admin endpoints are read-only in this release
+
 ## [0.5.0] - 2026-09-18
 
 ### Added
 
-- user model
-- email/password registration
+- authentication
 - Argon2 password hashing
 - JWT access tokens
-- bearer authentication
-- current-user endpoint
-- document ownership
-- conversation ownership
-- user-scoped vector retrieval
-- ownership-aware document access
-- ownership-aware conversation history
-- security documentation
-- v0.4.0 to v0.5.0 SQL migration
-- password and JWT tests
-
-### Changed
-
-- all document, retrieval, and chat endpoints now require authentication
-- duplicate document detection is scoped per user
-- semantic search only searches chunks owned by the authenticated user
-- Groq default model set to `openai/gpt-oss-120b`
-
-### Security
-
-- cross-user document access returns not found
-- cross-user conversation access returns not found
-- plaintext passwords are never stored
+- user-owned documents
+- user-owned conversations
+- user-scoped retrieval
 
 ## [0.4.0] - 2026-09-18
 

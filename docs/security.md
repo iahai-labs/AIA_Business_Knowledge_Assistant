@@ -42,3 +42,12 @@ v0.5.0 intentionally does not yet include:
 - rate limiting
 
 Those belong to later hardening milestones.
+
+
+## Administrator Access
+
+Administrator privileges are stored as a server-side boolean on the user record.
+
+The API does not trust a client-supplied role or JWT claim for administrator status. It loads the current user from the database and checks `is_admin` on each protected admin request.
+
+Admin endpoints are read-only in v0.6.0 and do not expose password hashes or application secrets.

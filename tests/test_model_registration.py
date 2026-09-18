@@ -18,3 +18,8 @@ def test_models_are_registered() -> None:
     assert "document_chunks" in Base.metadata.tables
     assert "conversations" in Base.metadata.tables
     assert "messages" in Base.metadata.tables
+
+
+def test_user_has_admin_flag() -> None:
+    assert hasattr(User, "is_admin")
+    assert User.__table__.c.is_admin.index is True

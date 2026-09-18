@@ -4,36 +4,29 @@ A production-minded AI knowledge system for small and medium businesses.
 
 ## Current Release
 
-**v0.5.0 — Authentication + User Ownership**
+**v0.6.0 — Admin Workflows + Operational Visibility**
 
-The application now isolates documents, retrieval, and conversations by authenticated user.
+The system now combines multi-user RAG with a minimal read-only administrator layer.
 
 ## Architecture
 
 ```text
-User
+Users
   |
-  v
-Register / Login
-  |
-  v
-Argon2 + JWT
-  |
-  v
-Authenticated API
-  |
-  +--> User Documents
+  +--> JWT-authenticated user APIs
   |       |
-  |       v
-  |    Jina Embeddings
-  |       |
-  |       v
-  |    pgvector Retrieval
+  |       +--> owned documents
+  |       +--> Jina embeddings
+  |       +--> pgvector retrieval
+  |       +--> Groq grounded answers
+  |       +--> owned conversations
   |
-  +--> User Conversations
+  +--> Admin authorization
           |
-          v
-       Groq Grounded Answers
+          +--> system stats
+          +--> user overview
+          +--> document overview
+          +--> conversation overview
 ```
 
 ## Current Capabilities
@@ -41,68 +34,45 @@ Authenticated API
 - email/password registration
 - Argon2 password hashing
 - JWT bearer authentication
-- current-user endpoint
-- user-owned documents
-- user-scoped semantic retrieval
-- user-owned conversations
-- conversation history isolation
-- PDF/TXT/Markdown ingestion
+- per-user document ownership
+- per-user vector retrieval
+- per-user conversation isolation
 - Jina embeddings
 - PostgreSQL + pgvector
-- similarity threshold
 - Groq grounded answers
 - source metadata
-- safe no-context response
-- automated tests
+- safe no-context responses
+- read-only admin authorization
+- system operational statistics
+- admin user overview
+- admin document overview
+- admin conversation overview
+- automated security and authorization tests
 
-## Authentication API
-
-```text
-POST /api/auth/register
-POST /api/auth/login
-GET  /api/auth/me
-```
-
-## Protected API
+## Admin API
 
 ```text
-POST    /api/documents
-GET     /api/documents
-GET     /api/documents/{document_id}
-POST    /api/documents/{document_id}/index
-DELETE  /api/documents/{document_id}
-
-POST    /api/retrieval/search
-
-POST    /api/chat/ask
-GET     /api/chat/conversations/{conversation_id}
+GET /api/admin/stats
+GET /api/admin/users
+GET /api/admin/documents
+GET /api/admin/conversations
 ```
 
-## Required JWT Configuration
+Admin endpoints require a user whose database record has:
 
-```env
-JWT_SECRET_KEY=use-a-strong-random-secret
-JWT_ALGORITHM=HS256
-JWT_ACCESS_TOKEN_MINUTES=60
+```text
+is_admin = TRUE
 ```
 
-Generate a development secret:
-
-```powershell
-python -c "import secrets; print(secrets.token_urlsafe(48))"
-```
-
-Never commit `.env`.
+Normal authenticated users receive HTTP 403.
 
 ## Upgrade
 
 Read:
 
 ```text
-docs/upgrade-v0.5.0.md
+docs/upgrade-v0.6.0.md
 ```
-
-The database requires a one-time migration because existing `documents` and `conversations` tables predate ownership fields.
 
 ## Swagger
 
@@ -123,7 +93,7 @@ docker compose exec app pytest
 - `v0.3.1` Jina embeddings + pgvector
 - `v0.4.0` Grounded answers + citations
 - `v0.5.0` Authentication + user ownership
-- `v0.6.0` Admin workflows
+- `v0.6.0` Admin workflows + operational visibility
 - `v0.9.0` Release candidate
 - `v1.0.0` Portfolio release
 

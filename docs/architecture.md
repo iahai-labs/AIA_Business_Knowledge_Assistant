@@ -70,3 +70,25 @@ All document retrieval, semantic retrieval, chat access, and conversation-histor
 Existing v0.4.0 documents and conversations have no owner. The migration intentionally leaves their new owner fields null.
 
 They are therefore invisible to authenticated users until reassigned or recreated. This avoids accidentally exposing legacy resources to a new account.
+
+
+## v0.6.0 Admin Boundary
+
+The admin layer is read-only and separate from normal user ownership paths.
+
+```text
+Authenticated User
+       |
+       +--> User-scoped RAG APIs
+
+Authenticated Admin
+       |
+       +--> Read-only operational overview
+              |
+              +-- users
+              +-- documents
+              +-- conversations
+              +-- aggregate stats
+```
+
+Admin authorization is checked against the current user record in PostgreSQL.

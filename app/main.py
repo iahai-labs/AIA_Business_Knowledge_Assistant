@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from sqlalchemy import text
 
 import app.models  # noqa: F401
+from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router
 from app.api.chat import router as chat_router
 from app.api.documents import router as documents_router
@@ -37,6 +38,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health_router)
     app.include_router(auth_router, prefix="/api")
+    app.include_router(admin_router, prefix="/api")
     app.include_router(documents_router, prefix="/api")
     app.include_router(retrieval_router, prefix="/api")
     app.include_router(chat_router, prefix="/api")

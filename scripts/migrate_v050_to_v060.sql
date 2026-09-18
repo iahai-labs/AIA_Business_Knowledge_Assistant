@@ -1,0 +1,9 @@
+BEGIN;
+
+ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT FALSE;
+
+CREATE INDEX IF NOT EXISTS ix_users_is_admin
+    ON users (is_admin);
+
+COMMIT;

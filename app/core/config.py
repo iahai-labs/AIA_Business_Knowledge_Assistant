@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "AIA Business Knowledge Assistant"
-    app_version: str = "0.5.0"
+    app_version: str = "0.6.0"
     environment: str = "development"
     debug: bool = True
 
