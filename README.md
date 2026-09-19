@@ -8,6 +8,27 @@ A production-minded, multi-user Retrieval-Augmented Generation system for small 
 
 AIA Business Knowledge Assistant turns business documents into a secure, searchable knowledge system with grounded AI answers and source metadata. v1.1.0 also includes a minimal browser UI for the live portfolio demo.
 
+## Live Portfolio Preview
+
+[Explore the Live Portfolio Preview](https://ai.iradhd.ir/work/business-knowledge-assistant/)
+
+The public preview demonstrates the Business Knowledge Assistant interface, sample business documents, grounded answers, source citations, and safe-fallback behavior.
+
+To prevent unintended API costs, this public preview is read-only and uses pre-recorded examples. Document uploads and live AI generation are available through a private demonstration.
+
+The full FastAPI RAG backend is included in this repository.
+
+### Application Preview
+
+![Business Knowledge Assistant Preview](docs/images/01-portfolio-preview.png)
+
+### Grounded Answer with Sources
+
+![Grounded Answer](docs/images/02-grounded-answer.png)
+
+### Safe Fallback
+
+![Safe Fallback](docs/images/03-safe-fallback.png)
 
 ## Web UI
 
