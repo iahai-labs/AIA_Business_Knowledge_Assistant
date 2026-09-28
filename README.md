@@ -2,6 +2,8 @@
 
 A production-minded, multi-user Retrieval-Augmented Generation system for small and medium businesses.
 
+[![CI](https://github.com/iahai-labs/AIA_Business_Knowledge_Assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/iahai-labs/AIA_Business_Knowledge_Assistant/actions/workflows/ci.yml)
+
 ## Stable Release
 
 **v1.1.0**
