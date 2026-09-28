@@ -1,5 +1,5 @@
-from app.core.config import settings
 from app.api.health import provider_health_check
+from app.core.config import settings
 
 
 def test_provider_health_reports_configuration(monkeypatch) -> None:

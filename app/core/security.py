@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import jwt
 from argon2 import PasswordHasher
@@ -29,11 +29,11 @@ def create_access_token(user_id: int) -> tuple[str, int]:
         raise RuntimeError("JWT_SECRET_KEY is not configured.")
 
     expires_delta = timedelta(minutes=settings.jwt_access_token_minutes)
-    expires_at = datetime.now(timezone.utc) + expires_delta
+    expires_at = datetime.now(UTC) + expires_delta
 
     payload = {
         "sub": str(user_id),
-        "iat": datetime.now(timezone.utc),
+        "iat": datetime.now(UTC),
         "exp": expires_at,
         "type": "access",
     }

@@ -38,7 +38,7 @@ def index_document(
             character_count=len(content),
             embedding=embedding,
         )
-        for index, (content, embedding) in enumerate(zip(chunks, embeddings))
+        for index, (content, embedding) in enumerate(zip(chunks, embeddings, strict=True))
     ]
 
     replace_document_chunks(

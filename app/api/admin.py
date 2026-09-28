@@ -4,13 +4,13 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_admin, get_db
 from app.models.user import User
 from app.observability.metrics import get_metrics_snapshot
-from app.schemas.metrics import RuntimeMetricsResponse
 from app.schemas.admin import (
     AdminConversationResponse,
     AdminDocumentResponse,
     AdminStatsResponse,
     AdminUserResponse,
 )
+from app.schemas.metrics import RuntimeMetricsResponse
 from app.services.admin_service import (
     admin_conversations,
     admin_documents,

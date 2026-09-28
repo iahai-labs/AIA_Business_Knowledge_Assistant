@@ -8,14 +8,14 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-import app.models  # noqa: F401
+import app.models
 from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router
 from app.api.chat import router as chat_router
 from app.api.documents import router as documents_router
 from app.api.health import router as health_router
-from app.api.retrieval import router as retrieval_router
 from app.api.release import router as release_router
+from app.api.retrieval import router as retrieval_router
 from app.api.ui import router as ui_router
 from app.core.config import settings
 from app.core.startup_validation import validate_startup_configuration

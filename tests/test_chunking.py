@@ -1,3 +1,5 @@
+import pytest
+
 from app.services.chunking_service import split_text
 
 
@@ -15,8 +17,5 @@ def test_split_text_creates_overlapping_chunks() -> None:
 
 
 def test_split_text_rejects_invalid_overlap() -> None:
-    try:
+    with pytest.raises(ValueError):
         split_text("abc", chunk_size=10, chunk_overlap=10)
-        assert False, "Expected ValueError"
-    except ValueError:
-        assert True
