@@ -100,6 +100,15 @@ flowchart TD
 - non-root Docker execution
 - Alembic migration management
 
+## Dependency & Tooling Files
+
+The repository intentionally keeps both dependency and tooling configuration files:
+
+- `requirements.txt` — pinned runtime and development dependencies used for installation, Docker builds, local development, and CI.
+- `pyproject.toml` — project metadata and repository tooling configuration, including pytest-related settings.
+
+Keeping both files is intentional because they serve different responsibilities.
+
 ## Quick Start
 
 Create `.env` from `.env.example` and configure:
